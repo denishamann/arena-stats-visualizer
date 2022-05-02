@@ -17,7 +17,6 @@ export default function App() {
     const dataWithoutSkirm = cleanTitlesAndSkirmishes(result.data);
     const dataOnlyS3 = getOnlyS3Data(dataWithoutSkirm);
     const only2sData = cleanNon2sData(dataOnlyS3);
-
     const possibleCompositions = getAllPossibleCompositions(only2sData);
 
     const statsForEachComposition = getStatsForEachComposition(
@@ -68,6 +67,10 @@ export default function App() {
         comp,
         total: 0,
         wins: 0,
+        aTotal: 0,
+        aWins: 0,
+        hTotal: 0,
+        hWins: 0,
       };
     });
 
@@ -79,8 +82,18 @@ export default function App() {
       );
       if (index !== -1) {
         stats[index].total = stats[index].total + 1;
+        if (row[47] === "ALLIANCE") {
+          stats[index].aTotal = stats[index].aTotal + 1;
+        } else if (row[47] === "HORDE") {
+          stats[index].hTotal = stats[index].hTotal + 1;
+        }
         if ((row[6] && row[7] && row[6] === row[7]) || row[25] > 0) {
           stats[index].wins = stats[index].wins + 1;
+          if (row[47] === "ALLIANCE") {
+            stats[index].aWins = stats[index].aWins + 1;
+          } else if (row[47] === "HORDE") {
+            stats[index].hWins = stats[index].hWins + 1;
+          }
         }
       } else {
         console.log("error with row", row);
@@ -104,6 +117,8 @@ export default function App() {
         <strong>Total matches: {totalMatches}</strong>
         <br />
         <strong className="total-wins">Total wins: {totalWins}</strong>
+        <br />
+        <strong>Total ratio: {(totalWins / totalMatches).toFixed(2)}</strong>
         <table className="data-table">
           <tbody>
             <tr>
@@ -116,14 +131,26 @@ export default function App() {
             {statsForEachComposition.map((item, i) => (
               <tr key={i}>
                 <td>{item.comp}</td>
-                <td>{item.total}</td>
-                <td>{item.wins}</td>
-                <td>{item.total - item.wins}</td>
+                <td>
+                  {item.total} (<span className="green">{item.aTotal}</span> +{" "}
+                  <span className="red">{item.hTotal}</span>)
+                </td>
+                <td>
+                  {item.wins} (<span className="green">{item.aWins}</span> +{" "}
+                  <span className="red">{item.hWins}</span>)
+                </td>
+                <td>
+                  {item.total - item.wins} (
+                  <span className="green">{item.aTotal - item.aWins}</span> +{" "}
+                  <span className="red">{item.hTotal - item.hWins}</span>)
+                </td>
                 <td>{(item.wins / item.total).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        <p className="green">Green = Alliance</p>
+        <p className="red">Red = Horde</p>
 
         <Modal
           isShowing={isImportFormShowed}
@@ -172,10 +199,15 @@ export default function App() {
         }
         .total-wins {
           margin-bottom: 10px;
-          color: green;
         }
         .data-table {
           margin-top: 10px;
+        }
+        .red {
+          color: red;
+        }
+        .green {
+          color: green;
         }
       `}</style>
     </>
