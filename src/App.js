@@ -119,7 +119,7 @@ export default function App() {
                 <td>{item.total}</td>
                 <td>{item.wins}</td>
                 <td>{item.total - item.wins}</td>
-                <td>{item.wins / item.total}</td>
+                <td>{(item.wins / item.total).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
