@@ -11,14 +11,17 @@ export default function App() {
   const [totalMatches, setTotalMatches] = useState(0);
   const [totalWins, setTotalWins] = useState(0);
   const [statsForEachComposition, setStatsForEachComposition] = useState([]);
+  const [corruptedCount, setCorruptedCount] = useState(0);
 
   const importConfirmed = () => {
     const result = Papa.parse(importString);
     const dataWithoutSkirm = cleanTitlesAndSkirmishes(result.data);
     const dataOnlyS3 = getOnlyS3Data(dataWithoutSkirm);
-    const only2sData = cleanNon2sData(dataOnlyS3);
+    const cleanData = cleanCorruptedData(dataOnlyS3);
+    console.log(dataOnlyS3.filter((x) => !cleanData.includes(x)));
+    setCorruptedCount(dataOnlyS3.length - cleanData.length);
+    const only2sData = cleanNon2sData(cleanData);
     const possibleCompositions = getAllPossibleCompositions(only2sData);
-
     const statsForEachComposition = getStatsForEachComposition(
       only2sData,
       possibleCompositions
@@ -42,12 +45,24 @@ export default function App() {
   };
 
   const getOnlyS3Data = (data) => {
-    const s3BeginTs = 1643065200;
+    const s3BeginTs = 1642377600; // Monday 17 January 2022 00:00:00
     return data.filter((row) => row[1] > s3BeginTs);
   };
 
   const cleanNon2sData = (data) => {
     return data.filter((row) => row[10] === "");
+  };
+
+  const cleanCorruptedData = (data) => {
+    return data.filter(
+      (row) =>
+        row[37] !== "" &&
+        row[38] !== "" &&
+        row[47] !== "" &&
+        row[8] !== "" &&
+        row[9] !== "" &&
+        ((row[6] && row[7]) || row[25])
+    );
   };
 
   const getAllPossibleCompositions = (data) => {
@@ -111,8 +126,8 @@ export default function App() {
         </button>
 
         <p>
-          Notice: It automatically removes all skirmished and all non 2s matches
-          and all matches before S3 begin
+          Notice: It automatically removes all skirmishes and all non 2s matches
+          and all matches before season 3 beginning (17th January).
         </p>
         <strong>Total matches: {totalMatches}</strong>
         <br />
@@ -151,6 +166,11 @@ export default function App() {
         </table>
         <p className="green">Green = Alliance</p>
         <p className="red">Red = Horde</p>
+        <p>
+          Skipped <strong className="red">{corruptedCount}</strong>{" "}
+          unprocessable records (not only in 2s). Open console to inspect them
+          if needed.
+        </p>
 
         <Modal
           isShowing={isImportFormShowed}
