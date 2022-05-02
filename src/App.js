@@ -15,17 +15,21 @@ export default function App() {
   const importConfirmed = () => {
     const result = Papa.parse(importString);
     const dataWithoutSkirm = cleanTitlesAndSkirmishes(result.data);
-    const only2sData = cleanNon2sData(dataWithoutSkirm);
-    const totalMatches = only2sData.length;
-    setTotalMatches(totalMatches);
-    const totalWins = getTotalWins(only2sData);
-    setTotalWins(totalWins);
+    const dataOnlyS3 = getOnlyS3Data(dataWithoutSkirm);
+    const only2sData = cleanNon2sData(dataOnlyS3);
 
     const possibleCompositions = getAllPossibleCompositions(only2sData);
 
     const statsForEachComposition = getStatsForEachComposition(
       only2sData,
       possibleCompositions
+    );
+
+    setTotalMatches(
+      statsForEachComposition.reduce((prev, curr) => prev + curr.total, 0)
+    );
+    setTotalWins(
+      statsForEachComposition.reduce((prev, curr) => prev + curr.wins, 0)
     );
 
     setStatsForEachComposition(statsForEachComposition);
@@ -38,57 +42,52 @@ export default function App() {
     return data.filter((row) => row[0] !== "NO");
   };
 
-  const cleanNon2sData = (data) => {
-    return data.filter((row) => row[10] === "");
+  const getOnlyS3Data = (data) => {
+    const s3BeginTs = 1643065200;
+    return data.filter((row) => row[1] > s3BeginTs);
   };
 
-  const getTotalWins = (data) => {
-    return data.filter((row) => {
-      if ((row[6] && row[7] && row[6] === row[7]) || row[29] > 0) {
-        return true;
-      }
-      return false;
-    }).length;
+  const cleanNon2sData = (data) => {
+    return data.filter((row) => row[10] === "");
   };
 
   const getAllPossibleCompositions = (data) => {
     const compositions = new Set();
     data.forEach((row) => {
-      if (row[37] && row[38] && row[37].localeCompare(row[38])) {
-        compositions.add(`${row[37]}+${row[38]}`);
-      } else if (row[37] && row[38]) {
-        compositions.add(`${row[38]}+${row[37]}`);
+      if (row[37] && row[38]) {
+        const arr = [row[37], row[38]].sort((a, b) => a.localeCompare(b));
+        compositions.add(`${arr[0]}+${arr[1]}`);
       }
     });
-    compositions.delete("+");
-    return Array.from(compositions);
+    return Array.from(compositions).sort((a, b) => a.localeCompare(b));
   };
 
   const getStatsForEachComposition = (data, possibleCompositions) => {
-    return possibleCompositions
-      .map((comp) => {
-        let total = 0;
-        let wins = 0;
-        data.forEach((row) => {
-          if (
-            `${row[37]}+${row[38]}` === comp ||
-            `${row[37]}+${row[38]}` === comp
-          ) {
-            total++;
-            if ((row[6] && row[7] && row[6] === row[7]) || row[29] > 0) {
-              wins++;
-            }
-          }
-        });
-        return {
-          comp,
-          total,
-          wins,
-        };
-      })
-      .sort((a, b) => {
-        return b.total - a.total;
-      });
+    const stats = possibleCompositions.map((comp) => {
+      return {
+        comp,
+        total: 0,
+        wins: 0,
+      };
+    });
+
+    data.forEach((row) => {
+      const index = stats.findIndex(
+        (s) =>
+          s.comp === `${row[37]}+${row[38]}` ||
+          s.comp === `${row[38]}+${row[37]}`
+      );
+      if (index !== -1) {
+        stats[index].total = stats[index].total + 1;
+        if ((row[6] && row[7] && row[6] === row[7]) || row[25] > 0) {
+          stats[index].wins = stats[index].wins + 1;
+        }
+      } else {
+        console.log("error with row", row);
+      }
+    });
+
+    return stats.sort((a, b) => b.total - a.total);
   };
 
   return (
@@ -100,7 +99,7 @@ export default function App() {
 
         <p>
           Notice: It automatically removes all skirmished and all non 2s matches
-          for now
+          and all matches before S3 begin
         </p>
         <strong>Total matches: {totalMatches}</strong>
         <br />
