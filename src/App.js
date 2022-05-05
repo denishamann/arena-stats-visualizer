@@ -159,7 +159,21 @@ export default function App() {
                   <span className="green">{item.aTotal - item.aWins}</span> +{" "}
                   <span className="red">{item.hTotal - item.hWins}</span>)
                 </td>
-                <td>{(item.wins / item.total).toFixed(2)}</td>
+                <td>
+                  {(item.wins / item.total).toFixed(2)} (
+                  <span className="green">
+                    {item.aTotal !== 0
+                      ? (item.aWins / item.aTotal).toFixed(2)
+                      : "-"}
+                  </span>{" "}
+                  /{" "}
+                  <span className="red">
+                    {item.hTotal !== 0
+                      ? (item.hWins / item.hTotal).toFixed(2)
+                      : "-"}
+                  </span>
+                  )
+                </td>
               </tr>
             ))}
           </tbody>
