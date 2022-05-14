@@ -8,7 +8,7 @@ const Modal = ({ isShowing, hide, title, ...props }) =>
         <>
           <div className="modal-overlay">
             <div className="modal-wrapper">
-              <div className="modal">
+              <div className="modalX">
                 <div className="modal-header">
                   <h4>{title}</h4>
                   <button
@@ -49,7 +49,7 @@ const Modal = ({ isShowing, hide, title, ...props }) =>
               align-items: center;
             }
 
-            .modal {
+            .modalX {
               z-index: 100;
               background: #fff;
               position: relative;
