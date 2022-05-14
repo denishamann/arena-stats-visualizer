@@ -1,4 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.css';
+import maxBy from 'lodash/maxBy';
+import minBy from 'lodash/minBy';
+import Papa from 'papaparse';
+import React, { useState } from 'react';
 import {
   Alert,
   Button,
@@ -8,14 +12,10 @@ import {
   Row as BootstrapRow,
   Table,
 } from 'react-bootstrap';
-import Papa from 'papaparse';
-import React, { useState } from 'react';
 import Modal from './modal';
-import useModal from './useModal';
 import { MyBadge } from './MyBadge';
 import { Row } from './Row';
-
-const _ = require('lodash');
+import useModal from './useModal';
 
 export default function App() {
   const { isShowing: isImportFormShowed, toggle: toggleImportForm } =
@@ -181,9 +181,9 @@ export default function App() {
         );
       }
     });
-    const longestMatch = _.maxBy(data, row => row.endTime - row.startTime);
+    const longestMatch = maxBy(data, row => row.endTime - row.startTime);
     console.log(longestMatch);
-    const shortestMatch = _.minBy(data, row => row.endTime - row.startTime);
+    const shortestMatch = minBy(data, row => row.endTime - row.startTime);
     myBadges.push(
       new MyBadge(
         `Longest match duration ${secondsToHms(
