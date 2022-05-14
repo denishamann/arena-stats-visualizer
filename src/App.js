@@ -9,24 +9,25 @@ import {
   Card,
   Col,
   Container,
+  Form,
+  Modal,
   Row as BootstrapRow,
   Table,
 } from 'react-bootstrap';
-import Modal from './modal';
 import { MyBadge } from './MyBadge';
 import { Row } from './Row';
-import useModal from './useModal';
 
 export default function App() {
-  const { isShowing: isImportFormShowed, toggle: toggleImportForm } =
-    useModal();
-
+  const [showModal, setShowModal] = useState(false);
   const [importString, setImportString] = useState('');
   const [totalMatches, setTotalMatches] = useState(0);
   const [totalWins, setTotalWins] = useState(0);
   const [statsForEachComposition, setStatsForEachComposition] = useState([]);
   const [corruptedCount, setCorruptedCount] = useState(0);
   const [badges, setBadges] = useState([]);
+
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
   const importConfirmed = () => {
     const result = Papa.parse(importString).data.map(row => new Row(row));
@@ -52,8 +53,7 @@ export default function App() {
     setBadges(computeBadges(only2sData));
 
     setStatsForEachComposition(statsForEachComposition);
-
-    toggleImportForm();
+    handleCloseModal();
   };
 
   const cleanTitlesAndSkirmishes = data => {
@@ -293,7 +293,7 @@ export default function App() {
   return (
     <>
       <div className="App">
-        <Button className="modal-toggle" onClick={toggleImportForm}>
+        <Button className="modal-toggle" onClick={handleShowModal}>
           Import
         </Button>
 
@@ -403,24 +403,34 @@ export default function App() {
           </div>
         )}
 
-        <Modal
-          isShowing={isImportFormShowed}
-          hide={toggleImportForm}
-          title="Import"
-        >
-          <div className="form-group">
-            <textarea
-              rows="20"
-              cols="49"
-              value={importString}
-              onChange={e => setImportString(e.target.value)}
-            ></textarea>
-          </div>
-          <div className="form-group">
-            <Button className="import-confirmed" onClick={importConfirmed}>
+        <Modal centered size="lg" show={showModal} onHide={handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Import</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Export string from addon</Form.Label>
+                <Form.Control
+                  autoFocus
+                  as="textarea"
+                  rows={20}
+                  cols={50}
+                  value={importString}
+                  onChange={e => setImportString(e.target.value)}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="primary"
+              className="import-confirmed"
+              onClick={importConfirmed}
+            >
               Import
             </Button>
-          </div>
+          </Modal.Footer>
         </Modal>
       </div>
 
@@ -445,9 +455,6 @@ export default function App() {
           margin-left: 10px;
         }
 
-        .form-group {
-          margin-top: 10px;
-        }
         .total-wins {
           margin-bottom: 10px;
         }
