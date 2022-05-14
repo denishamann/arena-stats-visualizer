@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/arena-stats-tbc-visualizer/static/css/main.e6c13ad2.css",
-    "main.js": "/arena-stats-tbc-visualizer/static/js/main.c9c6869f.js",
+    "main.css": "/arena-stats-tbc-visualizer/static/css/main.08885c06.css",
+    "main.js": "/arena-stats-tbc-visualizer/static/js/main.38985f9d.js",
     "static/js/787.9b8020d1.chunk.js": "/arena-stats-tbc-visualizer/static/js/787.9b8020d1.chunk.js",
     "index.html": "/arena-stats-tbc-visualizer/index.html",
-    "main.e6c13ad2.css.map": "/arena-stats-tbc-visualizer/static/css/main.e6c13ad2.css.map",
-    "main.c9c6869f.js.map": "/arena-stats-tbc-visualizer/static/js/main.c9c6869f.js.map",
+    "main.08885c06.css.map": "/arena-stats-tbc-visualizer/static/css/main.08885c06.css.map",
+    "main.38985f9d.js.map": "/arena-stats-tbc-visualizer/static/js/main.38985f9d.js.map",
     "787.9b8020d1.chunk.js.map": "/arena-stats-tbc-visualizer/static/js/787.9b8020d1.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e6c13ad2.css",
-    "static/js/main.c9c6869f.js"
+    "static/css/main.08885c06.css",
+    "static/js/main.38985f9d.js"
   ]
 }
