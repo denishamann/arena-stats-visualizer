@@ -1,6 +1,6 @@
-import PropTypes from "prop-types";
-import React from "react";
-import ReactDOM from "react-dom";
+import PropTypes from 'prop-types';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 const Modal = ({ isShowing, hide, title, ...props }) =>
   isShowing
