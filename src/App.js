@@ -11,11 +11,12 @@ import {
   Modal,
   Nav,
   Row as BootstrapRow,
+  Stack,
   Table,
 } from 'react-bootstrap';
-import { Row } from './row';
 import { computeBadges } from './badgeLogic';
 import { timestampsOk } from './constants';
+import { Row } from './row';
 
 export default function App() {
   // React state
@@ -161,12 +162,33 @@ export default function App() {
   return (
     <>
       <div className="App">
-        <Button className="modal-toggle" onClick={handleShowModal}>
-          Import
-        </Button>
+        <Container>
+          <Button className="modal-toggle" onClick={handleShowModal}>
+            Import
+          </Button>
+
+          <Stack className="float-end">
+            <div>
+              Contribute to the tool{' '}
+              <a href="https://github.com/denishamann/arena-stats-tbc-visualizer">
+                here
+              </a>
+            </div>
+            <div>
+              Contribute to the addon{' '}
+              <a href="https://github.com/denishamann/ArenaStatsTBC">here</a>
+            </div>
+            <div>
+              Get the addon on Curseforge{' '}
+              <a href="https://www.curseforge.com/wow/addons/arenastats-tbc">
+                here
+              </a>
+            </div>
+          </Stack>
+        </Container>
 
         {!only2sData.length ? (
-          <span>
+          <Container className="alerts-onboarding">
             <Alert key={'alert-infos'} variant={'primary'}>
               <Alert.Heading>Notice</Alert.Heading>
               This is a visualizer for the Classic TBC addon "ArenaStats - TBC"
@@ -188,9 +210,9 @@ export default function App() {
               you are the last one of your team alive. Otherwise, data for that
               particular match won't be recorded by the addon.
             </Alert>
-          </span>
+          </Container>
         ) : (
-          <div>
+          <Container>
             <br />
             <strong>Total matches: {totalMatches}</strong>
             <br />
@@ -311,7 +333,7 @@ export default function App() {
               unprocessable records (not only in 2s). Open console to inspect
               them if needed.
             </p>
-          </div>
+          </Container>
         )}
 
         <Modal centered size="lg" show={showModal} onHide={handleCloseModal}>
@@ -360,10 +382,7 @@ export default function App() {
           padding: 1rem 2rem;
           text-transform: uppercase;
           border: none;
-        }
-
-        button.modal-toggle:not(:first-child) {
-          margin-left: 10px;
+          margin-top: 10px;
         }
 
         .total-wins {
@@ -377,6 +396,9 @@ export default function App() {
         }
         .green {
           color: green;
+        }
+        .alerts-onboarding {
+          margin-top: 100px;
         }
       `}</style>
     </>
