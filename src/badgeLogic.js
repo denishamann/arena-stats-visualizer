@@ -38,7 +38,6 @@ export const computeBadges = data => {
     }
   });
   const longestMatch = maxBy(data, row => row.duration);
-  console.log('Longest match', longestMatch);
   const shortestMatch = minBy(data, row => row.duration);
   if (longestMatch) {
     myBadges.push(

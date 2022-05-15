@@ -207,7 +207,6 @@ export default function App() {
               variant="pills"
               defaultActiveKey="all"
               onSelect={(eventKey, _) => {
-                console.log(`Filtering data matching season=${eventKey}`);
                 setSeason(eventKey);
               }}
             >

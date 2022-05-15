@@ -62,19 +62,19 @@ export class Row {
     this.enemyFaction = row[47];
   }
 
-  won = _ =>
+  won = () =>
     (this.teamColor &&
       this.winnerColor &&
       this.teamColor === this.winnerColor) ||
     this.diffRating > 0 ||
     this.enemyDiffRating < 0;
 
-  isTitleOrSkirmish = _ =>
+  isTitleOrSkirmish = () =>
     this.isRanked === 'isRanked' ||
     this.enemyFaction === 'enemyFaction' ||
     this.isRanked === 'NO';
 
-  isRowClean = _ =>
+  isRowClean = () =>
     this.enemyPlayerClass1 &&
     this.enemyPlayerClass2 &&
     this.enemyFaction &&
@@ -83,7 +83,7 @@ export class Row {
     ((this.teamColor && this.winnerColor) || !isNaN(this.diffRating)) &&
     this.isValidSeason();
 
-  matchSummary = _ => {
+  matchSummary = () => {
     const outcome = this.won() ? 'Victory' : 'Defeat';
     const mmr = this.mmr ? ` at ${this.mmr} MMR` : '';
     const enemies = `${enemy(

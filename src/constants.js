@@ -6,7 +6,7 @@ export const SEASON_THREE_START = 1642204800; // Date and time (GMT): Saturday 1
 export const SEASON_THREE_END = 1651795199; // Date and time (GMT): Thursday 5 May 2022 23:59:59 (actually ended on May 3rd)
 export const SEASON_FOUR_START = 1652054401; // Date and time (GMT): Monday 9 May 2022 00:00:01 (actually started on May 10/11th)
 
-export const timestampsOk = _ =>
+export const timestampsOk = () =>
   SEASON_ONE_START <
   SEASON_ONE_END <
   SEASON_TWO_START <

@@ -26,9 +26,14 @@ export const longestSequence = (array, value) => {
   return maxCount;
 };
 
-export const enemy = (enemyName, enemyClass) =>
-  enemyClass
-    ? enemyName
-      ? `${enemyName} (${enemyClass})`
-      : enemyClass
-    : enemyName;
+export const enemy = (enemyName, enemyClass) => {
+  if (enemyClass) {
+    if (enemyName) {
+      return `${enemyName} (${enemyClass})`;
+    } else {
+      return enemyClass;
+    }
+  } else {
+    return enemyName;
+  }
+};
