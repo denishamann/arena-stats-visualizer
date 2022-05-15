@@ -1,6 +1,4 @@
 import 'bootstrap/dist/css/bootstrap.css';
-import maxBy from 'lodash/maxBy';
-import minBy from 'lodash/minBy';
 import Papa from 'papaparse';
 import React, { useState } from 'react';
 import {
@@ -11,75 +9,96 @@ import {
   Container,
   Form,
   Modal,
+  Nav,
   Row as BootstrapRow,
   Table,
 } from 'react-bootstrap';
-import { MyBadge } from './MyBadge';
-import { Row } from './Row';
+import { Row } from './row';
+import { computeBadges } from './badgeLogic';
+import { timestampsOk } from './constants';
 
 export default function App() {
+  // React state
   const [showModal, setShowModal] = useState(false);
   const [importString, setImportString] = useState('');
-  const [totalMatches, setTotalMatches] = useState(0);
-  const [totalWins, setTotalWins] = useState(0);
-  const [statsForEachComposition, setStatsForEachComposition] = useState([]);
+  const [only2sData, setOnly2sData] = useState([]);
   const [corruptedCount, setCorruptedCount] = useState(0);
-  const [badges, setBadges] = useState([]);
+  const [season, setSeason] = useState('all');
+
+  // Inferred state
+  let totalMatches = 0;
+  let totalWins = 0;
+  let statsForEachComposition = [];
+  let badges = [];
+
+  if (!timestampsOk())
+    console.log('Error in arena season start/end timestamps!');
 
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
 
+  // Import logic - compute state based on imported string
   const importConfirmed = () => {
     const result = Papa.parse(importString).data.map(row => new Row(row));
-    const dataWithoutSkirm = cleanTitlesAndSkirmishes(result);
-    const dataOnlyS3 = getOnlyS3Data(dataWithoutSkirm);
-    const cleanData = cleanCorruptedData(dataOnlyS3);
-    console.log(dataOnlyS3.filter(x => !cleanData.includes(x)));
-    setCorruptedCount(dataOnlyS3.length - cleanData.length);
+    const dataWithoutSkirm = result.filter(row => !row.isTitleOrSkirmish());
+    const cleanData = cleanCorruptedData(dataWithoutSkirm);
+    setCorruptedCount(dataWithoutSkirm.length - cleanData.length);
     const only2sData = cleanNon2sData(cleanData);
-    const possibleCompositions = getAllPossibleCompositions(only2sData);
-    const statsForEachComposition = getStatsForEachComposition(
-      only2sData,
-      possibleCompositions
-    );
-
-    setTotalMatches(
-      statsForEachComposition.reduce((prev, curr) => prev + curr.total, 0)
-    );
-    setTotalWins(
-      statsForEachComposition.reduce((prev, curr) => prev + curr.wins, 0)
-    );
-
-    setBadges(computeBadges(only2sData));
-
-    setStatsForEachComposition(statsForEachComposition);
+    setOnly2sData(only2sData);
     handleCloseModal();
   };
 
-  const cleanTitlesAndSkirmishes = data => {
-    data.shift();
-    return data.filter(row => row.isRanked !== 'NO');
-  };
-
-  const getOnlyS3Data = data => {
-    const s3BeginTs = 1642377600; // Monday 17 January 2022 00:00:00
-    return data.filter(row => row.startTime > s3BeginTs);
+  const cleanCorruptedData = data => {
+    console.log(
+      'Corrupted data',
+      data.filter(row => !row.isRowClean())
+    );
+    return data.filter(row => row.isRowClean());
   };
 
   const cleanNon2sData = data => {
     return data.filter(row => row.teamPlayerName3 === '');
   };
 
-  const cleanCorruptedData = data => {
-    return data.filter(
-      row =>
-        row.enemyPlayerClass1 !== '' &&
-        row.enemyPlayerClass2 !== '' &&
-        row.enemyFaction !== '' &&
-        row.teamPlayerName1 !== '' &&
-        row.teamPlayerName2 !== '' &&
-        ((row.teamColor && row.winnerColor) || row.diffRating)
-    );
+  // Rendering logic - compute inferred state based on state (i.e. user inputs)
+  const processState = () => {
+    if (only2sData.length) {
+      const seasonSpecificData = getSeasonSpecificData(only2sData);
+      const possibleCompositions =
+        getAllPossibleCompositions(seasonSpecificData);
+      statsForEachComposition = getStatsForEachComposition(
+        seasonSpecificData,
+        possibleCompositions
+      );
+
+      totalMatches = statsForEachComposition.reduce(
+        (prev, curr) => prev + curr.total,
+        0
+      );
+      totalWins = statsForEachComposition.reduce(
+        (prev, curr) => prev + curr.wins,
+        0
+      );
+
+      badges = computeBadges(seasonSpecificData);
+    }
+  };
+
+  const getSeasonSpecificData = data => {
+    switch (season) {
+      case 'all':
+        return data;
+      case '1':
+        return data.filter(row => row.isSeasonOne());
+      case '2':
+        return data.filter(row => row.isSeasonTwo());
+      case '3':
+        return data.filter(row => row.isSeasonThree());
+      case '4':
+        return data.filter(row => row.isSeasonFour());
+      default:
+        return data;
+    }
   };
 
   const getAllPossibleCompositions = data => {
@@ -121,7 +140,7 @@ export default function App() {
         } else if (row.enemyFaction === 'HORDE') {
           stats[index].hTotal = stats[index].hTotal + 1;
         }
-        if (won(row)) {
+        if (row.won()) {
           stats[index].wins = stats[index].wins + 1;
           if (row.enemyFaction === 'ALLIANCE') {
             stats[index].aWins = stats[index].aWins + 1;
@@ -130,165 +149,14 @@ export default function App() {
           }
         }
       } else {
-        console.log('error with row', row);
+        console.log('Error with row', row);
       }
     });
 
     return stats.sort((a, b) => b.total - a.total);
   };
 
-  const computeBadges = data => {
-    let myBadges = [];
-    const allClasses = [
-      'WARRIOR',
-      'PALADIN',
-      'HUNTER',
-      'SHAMAN',
-      'ROGUE',
-      'DRUID',
-      'PRIEST',
-      'MAGE',
-      'WARLOCK',
-    ];
-    allClasses.forEach(currentClass => {
-      const currentClassMatches = data.filter(
-        row =>
-          row.enemyPlayerClass1 === currentClass ||
-          row.enemyPlayerClass2 === currentClass ||
-          row.enemyPlayerClass3 === currentClass ||
-          row.enemyPlayerClass4 === currentClass ||
-          row.enemyPlayerClass5 === currentClass
-      );
-      const currentClassWinRate =
-        currentClassMatches.filter(row => won(row)).length /
-        currentClassMatches.length;
-      if (currentClassWinRate > 0.53) {
-        myBadges.push(
-          new MyBadge(
-            `Good against ${currentClass.toLowerCase()}`,
-            `Win rate is ${(currentClassWinRate * 100).toFixed(1)}%`,
-            'success'
-          )
-        );
-      }
-      if (currentClassWinRate < 0.47) {
-        myBadges.push(
-          new MyBadge(
-            `Bad against ${currentClass.toLowerCase()}`,
-            `Win rate is ${(currentClassWinRate * 100).toFixed(1)}%`,
-            'danger'
-          )
-        );
-      }
-    });
-    const longestMatch = maxBy(data, row => row.endTime - row.startTime);
-    console.log(longestMatch);
-    const shortestMatch = minBy(data, row => row.endTime - row.startTime);
-    myBadges.push(
-      new MyBadge(
-        `Longest match duration ${secondsToHms(
-          longestMatch.endTime - longestMatch.startTime
-        )}`,
-        matchSummary(longestMatch),
-        'primary'
-      )
-    );
-    myBadges.push(
-      new MyBadge(
-        `Shortest match lasted ${secondsToHms(
-          shortestMatch.endTime - shortestMatch.startTime
-        )}`,
-        matchSummary(shortestMatch),
-        'primary'
-      )
-    );
-    const meanDur = secondsToHms(
-      mean(data.map(row => row.endTime - row.startTime))
-    );
-    const medianDur = secondsToHms(
-      median(data.map(row => row.endTime - row.startTime))
-    );
-    myBadges.push(
-      new MyBadge(
-        'Match duration trends',
-        `Mean match duration: ${meanDur}, Median match duration: ${medianDur}`,
-        'primary'
-      )
-    );
-    myBadges.push(
-      new MyBadge(
-        `Longest winning streak`,
-        `${longestSequence(
-          data.map(row => won(row)),
-          true
-        )} victories in a row!`,
-        'success'
-      )
-    );
-    myBadges.push(
-      new MyBadge(
-        `Longest losing streak`,
-        `${longestSequence(
-          data.map(row => won(row)),
-          false
-        )} defeats in a row :(`,
-        'danger'
-      )
-    );
-
-    return myBadges;
-  };
-
-  const won = row =>
-    (row.teamColor && row.winnerColor && row.teamColor === row.winnerColor) ||
-    row.diffRating > 0 ||
-    row.enemyDiffRating < 0;
-
-  function secondsToHms(d) {
-    d = Number(d);
-    const h = Math.floor(d / 3600);
-    const s = Math.floor((d % 3600) % 60);
-    const m = Math.floor((d % 3600) / 60);
-
-    const hDisplay = h > 0 ? h + (h === 1 ? ' hour, ' : ' hours, ') : '';
-    const mDisplay = m > 0 ? m + (m === 1 ? ' min, ' : ' min, ') : '';
-    const sDisplay = s > 0 ? s + (s === 1 ? ' sec' : ' sec') : '';
-    return hDisplay + mDisplay + sDisplay;
-  }
-
-  const mean = array => array.reduce((a, b) => a + b) / array.length;
-  const median = array =>
-    array.slice().sort((a, b) => a - b)[Math.floor(array.length / 2)];
-  const longestSequence = (array, value) => {
-    let currentCount = 0;
-    let maxCount = 0;
-    for (let arrayValue of array) {
-      if (arrayValue === value) currentCount++;
-      if (arrayValue !== value) {
-        maxCount = Math.max(maxCount, currentCount);
-        currentCount = 0;
-      }
-    }
-    return maxCount;
-  };
-
-  const matchSummary = row => {
-    const outcome = won(row) ? 'Victory' : 'Defeat';
-    const mmr = row.mmr ? ` at ${row.mmr} MMR` : '';
-    const enemies = `${enemy(
-      row.enemyPlayerName1,
-      row.enemyPlayerClass1
-    )} and ${enemy(row.enemyPlayerName2, row.enemyPlayerClass2)}`;
-    return `${outcome} as ${row.teamPlayerName1}/${row.teamPlayerName2} vs ${enemies}${mmr}`;
-    // could also have shown isRanked/diffRating, day (endTime), zoneId...
-  };
-
-  const enemy = (enemyName, enemyClass) =>
-    enemyClass
-      ? enemyName
-        ? `${enemyName} (${enemyClass})`
-        : enemyClass
-      : enemyName;
+  processState();
 
   return (
     <>
@@ -297,12 +165,30 @@ export default function App() {
           Import
         </Button>
 
-        {!importString ? (
-          <Alert key={'notice-trimming'} variant={'primary'}>
-            <Alert.Heading>Notice</Alert.Heading>
-            It automatically removes all skirmishes and all non 2s matches and
-            all matches before season 3 beginning (January, 17th).
-          </Alert>
+        {!only2sData.length ? (
+          <span>
+            <Alert key={'alert-infos'} variant={'primary'}>
+              <Alert.Heading>Notice</Alert.Heading>
+              This is a visualizer for the Classic TBC addon "ArenaStats - TBC"
+              It allows you to import your data in order to analyze them by
+              bracket, by season, by enemy composition, and much more (to come!)
+              All you have to do is click on the "Export" button in-game, copy
+              the String, click on the "Import" button here, and paste it.
+            </Alert>
+            <Alert key={'alert-data'} variant={'warning'}>
+              It automatically removes all skirmishes and all non 2s matches.
+              Support for 3s and 5s is coming soon™
+            </Alert>
+            <Alert key={'alert-trimming'} variant={'warning'}>
+              You will only see stats for matches played since you installed the
+              addon
+            </Alert>
+            <Alert key={'alert-leaving'} variant={'warning'}>
+              If you want to leave a match in-game before it is ended, make sure
+              you are the last one of your team alive. Otherwise, data for that
+              particular match won't be recorded by the addon.
+            </Alert>
+          </span>
         ) : (
           <div>
             <br />
@@ -310,11 +196,38 @@ export default function App() {
             <br />
             <strong className="total-wins">Total wins: {totalWins}</strong>
             <br />
-            <strong>
-              Total win rate: {((totalWins / totalMatches) * 100).toFixed(2)}%
-            </strong>
+            {!!totalMatches && (
+              <strong>
+                Total win rate: {((totalWins / totalMatches) * 100).toFixed(2)}%
+              </strong>
+            )}
             <br />
             <br />
+            <Nav
+              variant="pills"
+              defaultActiveKey="all"
+              onSelect={(eventKey, _) => {
+                console.log(`Filtering data matching season=${eventKey}`);
+                setSeason(eventKey);
+              }}
+            >
+              <Nav.Item>
+                <Nav.Link eventKey="all">All seasons</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="1">Season 1</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="2">Season 2</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="3">Season 3</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="4">Season 4</Nav.Link>
+              </Nav.Item>
+            </Nav>
+            <br />{' '}
             <Table striped bordered hover className="data-table">
               <thead>
                 <tr key={'head'}>
@@ -365,7 +278,6 @@ export default function App() {
               <span className="green">Green = Alliance</span>{' '}
               <span className="red">Red = Horde</span>
             </p>
-
             <Container>
               <BootstrapRow
                 xs={1}
