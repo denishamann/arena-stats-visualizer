@@ -12,11 +12,11 @@ import {
   Nav,
   Row as BootstrapRow,
   Stack,
-  Table,
 } from 'react-bootstrap';
 import { computeBadges } from './badgeLogic';
 import { timestampsOk } from './constants';
 import { Row } from './row';
+import BootstrapTable from 'react-bootstrap-table-next';
 
 export default function App() {
   // React state
@@ -159,6 +159,137 @@ export default function App() {
 
   processState();
 
+  const columns = [
+    {
+      dataField: 'composition',
+      text: 'Enemy composition',
+      sort: true,
+      formatter: (cell, _) => cell.content,
+      sortValue: (cell, _) => cell.value,
+      headerStyle: (column, colIndex) => {
+        return { width: '200px' };
+      },
+    },
+    {
+      dataField: 'total',
+      text: 'Total matches',
+      sort: true,
+      formatter: (cell, _) => cell.content,
+      sortValue: (cell, _) => cell.value,
+      headerStyle: (column, colIndex) => {
+        return { width: '175px' };
+      },
+    },
+    {
+      dataField: 'wins',
+      text: 'Wins',
+      sort: true,
+      formatter: (cell, _) => cell.content,
+      sortValue: (cell, _) => cell.value,
+      headerStyle: (column, colIndex) => {
+        return { width: '175px' };
+      },
+    },
+    {
+      dataField: 'losses',
+      text: 'Losses',
+      sort: true,
+      formatter: (cell, _) => cell.content,
+      sortValue: (cell, _) => cell.value,
+      headerStyle: (column, colIndex) => {
+        return { width: '175px' };
+      },
+    },
+    {
+      dataField: 'percent',
+      text: '%',
+      sort: true,
+      formatter: (cell, _) => cell.content,
+      sortValue: (cell, _) => cell.value,
+      headerStyle: (column, colIndex) => {
+        return { width: '90px' };
+      },
+    },
+    {
+      dataField: 'aPercent',
+      text: '% (A)',
+      sort: true,
+      formatter: (cell, _) => cell.content,
+      sortValue: (cell, _) => cell.value,
+      headerStyle: (column, colIndex) => {
+        return { width: '90px' };
+      },
+    },
+    {
+      dataField: 'hPercent',
+      text: '% (H)',
+      sort: true,
+      formatter: (cell, _) => cell.content,
+      sortValue: (cell, _) => cell.value,
+      headerStyle: (column, colIndex) => {
+        return { width: '90px' };
+      },
+    },
+  ];
+
+  const content = statsForEachComposition.map((item, _) => {
+    return {
+      composition: { value: item.comp, content: item.comp },
+      total: {
+        value: item.total,
+        content: (
+          <span>
+            {item.total} <span className="blue">({item.aTotal}</span> +{' '}
+            <span className="red">{item.hTotal}</span>)
+          </span>
+        ),
+      },
+      wins: {
+        value: item.wins,
+        content: (
+          <span>
+            {item.wins} <span className="blue">({item.aWins}</span> +{' '}
+            <span className="red">{item.hWins}</span>)
+          </span>
+        ),
+      },
+      losses: {
+        value: item.total - item.wins,
+        content: (
+          <span>
+            {item.total - item.wins}{' '}
+            <span className="blue">({item.aTotal - item.aWins}</span> +{' '}
+            <span className="red">{item.hTotal - item.hWins}</span>)
+          </span>
+        ),
+      },
+      percent: {
+        value: item.wins / item.total,
+        content: <span>{((item.wins / item.total) * 100).toFixed(1)}</span>,
+      },
+      aPercent: {
+        value: item.aTotal !== 0 ? item.aWins / item.aTotal : -1,
+        content: (
+          <span className="blue">
+            {item.aTotal !== 0
+              ? ((item.aWins / item.aTotal) * 100).toFixed(1)
+              : '-'}
+          </span>
+        ),
+      },
+      hPercent: {
+        value: item.hTotal !== 0 ? item.hWins / item.hTotal : -1,
+        content: (
+          <span className="red">
+            {item.hTotal !== 0
+              ? ((item.hWins / item.hTotal) * 100).toFixed(1)
+              : '-'}
+          </span>
+        ),
+      },
+    };
+  });
+
   return (
     <>
       <div className="App">
@@ -249,56 +380,20 @@ export default function App() {
               </Nav.Item>
             </Nav>
             <br />{' '}
-            <Table striped bordered hover className="data-table">
-              <thead>
-                <tr key={'head'}>
-                  <th>Enemy composition</th>
-                  <th>Total matches</th>
-                  <th>Wins</th>
-                  <th>Losses</th>
-                  <th>Ratio</th>
-                </tr>
-              </thead>
-              <tbody>
-                {statsForEachComposition.map((item, _) => (
-                  <tr key={item.comp}>
-                    <td>{item.comp}</td>
-                    <td>
-                      {item.total} (<span className="green">{item.aTotal}</span>{' '}
-                      + <span className="red">{item.hTotal}</span>)
-                    </td>
-                    <td>
-                      {item.wins} (<span className="green">{item.aWins}</span> +{' '}
-                      <span className="red">{item.hWins}</span>)
-                    </td>
-                    <td>
-                      {item.total - item.wins} (
-                      <span className="green">{item.aTotal - item.aWins}</span>{' '}
-                      + <span className="red">{item.hTotal - item.hWins}</span>)
-                    </td>
-                    <td>
-                      {(item.wins / item.total).toFixed(2)} (
-                      <span className="green">
-                        {item.aTotal !== 0
-                          ? (item.aWins / item.aTotal).toFixed(2)
-                          : '-'}
-                      </span>{' '}
-                      /{' '}
-                      <span className="red">
-                        {item.hTotal !== 0
-                          ? (item.hWins / item.hTotal).toFixed(2)
-                          : '-'}
-                      </span>
-                      )
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
             <p>
-              <span className="green">Green = Alliance</span>{' '}
-              <span className="red">Red = Horde</span>
+              <span className="blue">Blue = vs Alliance</span>{' '}
+              <span className="red">Red = vs Horde</span>
             </p>
+            <BootstrapTable
+              keyField="composition"
+              data={content}
+              columns={columns}
+              bootstrap4={true}
+              striped={true}
+              bordered={true}
+              hover={true}
+              classes={'data-table'}
+            />
             <Container>
               <BootstrapRow
                 xs={1}
@@ -392,10 +487,10 @@ export default function App() {
           margin-top: 10px;
         }
         .red {
-          color: red;
+          color: #dc3545;
         }
-        .green {
-          color: green;
+        .blue {
+          color: #0dcaf0;
         }
         .alerts-onboarding {
           margin-top: 100px;
