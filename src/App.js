@@ -164,8 +164,8 @@ export default function App() {
       dataField: 'composition',
       text: 'Enemy composition',
       sort: true,
-      formatter: cell => cell.content,
-      sortValue: cell => cell.value,
+      formatter: cell => cell,
+      sortValue: cell => cell,
       headerStyle: (column, colIndex) => {
         return { width: '200px' };
       },
@@ -174,8 +174,16 @@ export default function App() {
       dataField: 'total',
       text: 'Total matches',
       sort: true,
-      formatter: cell => cell.content,
-      sortValue: cell => cell.value,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return (
+          <div>
+            {item.total} <span className="blue">({item.aTotal}</span> +{' '}
+            <span className="red">{item.hTotal}</span>)
+          </div>
+        );
+      },
+      sortValue: cell => JSON.parse(cell).total,
       headerStyle: (column, colIndex) => {
         return { width: '175px' };
       },
@@ -184,8 +192,16 @@ export default function App() {
       dataField: 'wins',
       text: 'Wins',
       sort: true,
-      formatter: cell => cell.content,
-      sortValue: cell => cell.value,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return (
+          <div>
+            {item.wins} <span className="blue">({item.aWins}</span> +{' '}
+            <span className="red">{item.hWins}</span>)
+          </div>
+        );
+      },
+      sortValue: cell => JSON.parse(cell).wins,
       headerStyle: (column, colIndex) => {
         return { width: '175px' };
       },
@@ -194,8 +210,20 @@ export default function App() {
       dataField: 'losses',
       text: 'Losses',
       sort: true,
-      formatter: cell => cell.content,
-      sortValue: cell => cell.value,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return (
+          <div>
+            {item.total - item.wins}{' '}
+            <span className="blue">({item.aTotal - item.aWins}</span> +{' '}
+            <span className="red">{item.hTotal - item.hWins}</span>)
+          </div>
+        );
+      },
+      sortValue: cell => {
+        const item = JSON.parse(cell);
+        return item.total - item.wins;
+      },
       headerStyle: (column, colIndex) => {
         return { width: '175px' };
       },
@@ -204,8 +232,14 @@ export default function App() {
       dataField: 'percent',
       text: '%',
       sort: true,
-      formatter: cell => cell.content,
-      sortValue: cell => cell.value,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return <div>{((item.wins / item.total) * 100).toFixed(1)}</div>;
+      },
+      sortValue: cell => {
+        const item = JSON.parse(cell);
+        return item.wins / item.total;
+      },
       headerStyle: (column, colIndex) => {
         return { width: '90px' };
       },
@@ -214,8 +248,20 @@ export default function App() {
       dataField: 'aPercent',
       text: '% (A)',
       sort: true,
-      formatter: cell => cell.content,
-      sortValue: cell => cell.value,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return (
+          <div className="blue">
+            {item.aTotal !== 0
+              ? ((item.aWins / item.aTotal) * 100).toFixed(1)
+              : '-'}
+          </div>
+        );
+      },
+      sortValue: cell => {
+        const item = JSON.parse(cell);
+        return item.aTotal !== 0 ? item.aWins / item.aTotal : -1;
+      },
       headerStyle: (column, colIndex) => {
         return { width: '90px' };
       },
@@ -224,8 +270,20 @@ export default function App() {
       dataField: 'hPercent',
       text: '% (H)',
       sort: true,
-      formatter: cell => cell.content,
-      sortValue: cell => cell.value,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return (
+          <div className="red">
+            {item.hTotal !== 0
+              ? ((item.hWins / item.hTotal) * 100).toFixed(1)
+              : '-'}
+          </div>
+        );
+      },
+      sortValue: cell => {
+        const item = JSON.parse(cell);
+        return item.hTotal !== 0 ? item.hWins / item.hTotal : -1;
+      },
       headerStyle: (column, colIndex) => {
         return { width: '90px' };
       },
@@ -234,59 +292,37 @@ export default function App() {
 
   const content = statsForEachComposition.map(item => {
     return {
-      composition: { value: item.comp, content: item.comp },
-      total: {
-        value: item.total,
-        content: (
-          <div>
-            {item.total} <span className="blue">({item.aTotal}</span> +{' '}
-            <span className="red">{item.hTotal}</span>)
-          </div>
-        ),
-      },
-      wins: {
-        value: item.wins,
-        content: (
-          <div>
-            {item.wins} <span className="blue">({item.aWins}</span> +{' '}
-            <span className="red">{item.hWins}</span>)
-          </div>
-        ),
-      },
-      losses: {
-        value: item.total - item.wins,
-        content: (
-          <div>
-            {item.total - item.wins}{' '}
-            <span className="blue">({item.aTotal - item.aWins}</span> +{' '}
-            <span className="red">{item.hTotal - item.hWins}</span>)
-          </div>
-        ),
-      },
-      percent: {
-        value: item.wins / item.total,
-        content: <div>{((item.wins / item.total) * 100).toFixed(1)}</div>,
-      },
-      aPercent: {
-        value: item.aTotal !== 0 ? item.aWins / item.aTotal : -1,
-        content: (
-          <div className="blue">
-            {item.aTotal !== 0
-              ? ((item.aWins / item.aTotal) * 100).toFixed(1)
-              : '-'}
-          </div>
-        ),
-      },
-      hPercent: {
-        value: item.hTotal !== 0 ? item.hWins / item.hTotal : -1,
-        content: (
-          <div className="red">
-            {item.hTotal !== 0
-              ? ((item.hWins / item.hTotal) * 100).toFixed(1)
-              : '-'}
-          </div>
-        ),
-      },
+      composition: item.comp,
+      total: JSON.stringify({
+        total: item.total,
+        aTotal: item.aTotal,
+        hTotal: item.hTotal,
+      }),
+      wins: JSON.stringify({
+        wins: item.wins,
+        aWins: item.aWins,
+        hWins: item.hWins,
+      }),
+      losses: JSON.stringify({
+        total: item.total,
+        wins: item.wins,
+        aTotal: item.aTotal,
+        aWins: item.aWins,
+        hTotal: item.hTotal,
+        hWins: item.hWins,
+      }),
+      percent: JSON.stringify({
+        wins: item.wins,
+        total: item.total,
+      }),
+      aPercent: JSON.stringify({
+        aTotal: item.aTotal,
+        aWins: item.aWins,
+      }),
+      hPercent: JSON.stringify({
+        hTotal: item.hTotal,
+        hWins: item.hWins,
+      }),
     };
   });
 
