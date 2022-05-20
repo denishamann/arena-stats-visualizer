@@ -164,8 +164,8 @@ export default function App() {
       dataField: 'composition',
       text: 'Enemy composition',
       sort: true,
-      formatter: (cell, _) => cell.content,
-      sortValue: (cell, _) => cell.value,
+      formatter: cell => cell.content,
+      sortValue: cell => cell.value,
       headerStyle: (column, colIndex) => {
         return { width: '200px' };
       },
@@ -174,8 +174,8 @@ export default function App() {
       dataField: 'total',
       text: 'Total matches',
       sort: true,
-      formatter: (cell, _) => cell.content,
-      sortValue: (cell, _) => cell.value,
+      formatter: cell => cell.content,
+      sortValue: cell => cell.value,
       headerStyle: (column, colIndex) => {
         return { width: '175px' };
       },
@@ -184,8 +184,8 @@ export default function App() {
       dataField: 'wins',
       text: 'Wins',
       sort: true,
-      formatter: (cell, _) => cell.content,
-      sortValue: (cell, _) => cell.value,
+      formatter: cell => cell.content,
+      sortValue: cell => cell.value,
       headerStyle: (column, colIndex) => {
         return { width: '175px' };
       },
@@ -194,8 +194,8 @@ export default function App() {
       dataField: 'losses',
       text: 'Losses',
       sort: true,
-      formatter: (cell, _) => cell.content,
-      sortValue: (cell, _) => cell.value,
+      formatter: cell => cell.content,
+      sortValue: cell => cell.value,
       headerStyle: (column, colIndex) => {
         return { width: '175px' };
       },
@@ -204,8 +204,8 @@ export default function App() {
       dataField: 'percent',
       text: '%',
       sort: true,
-      formatter: (cell, _) => cell.content,
-      sortValue: (cell, _) => cell.value,
+      formatter: cell => cell.content,
+      sortValue: cell => cell.value,
       headerStyle: (column, colIndex) => {
         return { width: '90px' };
       },
@@ -214,8 +214,8 @@ export default function App() {
       dataField: 'aPercent',
       text: '% (A)',
       sort: true,
-      formatter: (cell, _) => cell.content,
-      sortValue: (cell, _) => cell.value,
+      formatter: cell => cell.content,
+      sortValue: cell => cell.value,
       headerStyle: (column, colIndex) => {
         return { width: '90px' };
       },
@@ -224,67 +224,67 @@ export default function App() {
       dataField: 'hPercent',
       text: '% (H)',
       sort: true,
-      formatter: (cell, _) => cell.content,
-      sortValue: (cell, _) => cell.value,
+      formatter: cell => cell.content,
+      sortValue: cell => cell.value,
       headerStyle: (column, colIndex) => {
         return { width: '90px' };
       },
     },
   ];
 
-  const content = statsForEachComposition.map((item, _) => {
+  const content = statsForEachComposition.map(item => {
     return {
       composition: { value: item.comp, content: item.comp },
       total: {
         value: item.total,
         content: (
-          <span>
+          <div>
             {item.total} <span className="blue">({item.aTotal}</span> +{' '}
             <span className="red">{item.hTotal}</span>)
-          </span>
+          </div>
         ),
       },
       wins: {
         value: item.wins,
         content: (
-          <span>
+          <div>
             {item.wins} <span className="blue">({item.aWins}</span> +{' '}
             <span className="red">{item.hWins}</span>)
-          </span>
+          </div>
         ),
       },
       losses: {
         value: item.total - item.wins,
         content: (
-          <span>
+          <div>
             {item.total - item.wins}{' '}
             <span className="blue">({item.aTotal - item.aWins}</span> +{' '}
             <span className="red">{item.hTotal - item.hWins}</span>)
-          </span>
+          </div>
         ),
       },
       percent: {
         value: item.wins / item.total,
-        content: <span>{((item.wins / item.total) * 100).toFixed(1)}</span>,
+        content: <div>{((item.wins / item.total) * 100).toFixed(1)}</div>,
       },
       aPercent: {
         value: item.aTotal !== 0 ? item.aWins / item.aTotal : -1,
         content: (
-          <span className="blue">
+          <div className="blue">
             {item.aTotal !== 0
               ? ((item.aWins / item.aTotal) * 100).toFixed(1)
               : '-'}
-          </span>
+          </div>
         ),
       },
       hPercent: {
         value: item.hTotal !== 0 ? item.hWins / item.hTotal : -1,
         content: (
-          <span className="red">
+          <div className="red">
             {item.hTotal !== 0
               ? ((item.hWins / item.hTotal) * 100).toFixed(1)
               : '-'}
-          </span>
+          </div>
         ),
       },
     };
@@ -359,7 +359,7 @@ export default function App() {
             <Nav
               variant="pills"
               defaultActiveKey="all"
-              onSelect={(eventKey, _) => {
+              onSelect={eventKey => {
                 setSeason(eventKey);
               }}
             >
