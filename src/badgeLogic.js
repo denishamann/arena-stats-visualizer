@@ -103,7 +103,7 @@ export const computeBadges = data => {
     myBadges.push(
       new MyBadge(
         `You peaked at ${highestRatingMatch.newTeamRating} team rating`,
-        `With ${highestRatingMatch.teamPlayerName1}/${highestRatingMatch.teamPlayerName2}`,
+        `As ${highestRatingMatch.teamPlayerName1}/${highestRatingMatch.teamPlayerName2}`,
         'success'
       )
     );
@@ -112,7 +112,7 @@ export const computeBadges = data => {
     myBadges.push(
       new MyBadge(
         `You peaked at ${highestMmrMatch.mmr} MMR`,
-        `With ${highestMmrMatch.teamPlayerName1}/${highestMmrMatch.teamPlayerName2}`,
+        `As ${highestMmrMatch.teamPlayerName1}/${highestMmrMatch.teamPlayerName2}`,
         'success'
       )
     );
@@ -120,8 +120,8 @@ export const computeBadges = data => {
   if (highestRatingDefeatedMatch) {
     myBadges.push(
       new MyBadge(
-        `You defeated an opponent with ${highestRatingDefeatedMatch.enemyNewTeamRating} team rating`,
-        `With ${highestRatingDefeatedMatch.teamPlayerName1}/${
+        `You defeated an opponent As ${highestRatingDefeatedMatch.enemyNewTeamRating} team rating`,
+        `As ${highestRatingDefeatedMatch.teamPlayerName1}/${
           highestRatingDefeatedMatch.teamPlayerName2
         } against ${enemy(
           highestRatingDefeatedMatch.enemyPlayerName1,
@@ -138,7 +138,7 @@ export const computeBadges = data => {
     myBadges.push(
       new MyBadge(
         `You defeated an opponent with ${highestMmrDefeatedMatch.enemyMmr} MMR`,
-        `With ${highestMmrDefeatedMatch.teamPlayerName1}/${
+        `As ${highestMmrDefeatedMatch.teamPlayerName1}/${
           highestMmrDefeatedMatch.teamPlayerName2
         } against ${enemy(
           highestMmrDefeatedMatch.enemyPlayerName1,

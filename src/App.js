@@ -12,11 +12,11 @@ import {
   Nav,
   Row as BootstrapRow,
   Stack,
-  Table,
 } from 'react-bootstrap';
 import { computeBadges } from './badgeLogic';
 import { timestampsOk } from './constants';
 import { Row } from './row';
+import BootstrapTable from 'react-bootstrap-table-next';
 
 export default function App() {
   // React state
@@ -159,6 +159,173 @@ export default function App() {
 
   processState();
 
+  const columns = [
+    {
+      dataField: 'composition',
+      text: 'Enemy composition',
+      sort: true,
+      formatter: cell => cell,
+      sortValue: cell => cell,
+      headerStyle: (column, colIndex) => {
+        return { width: '200px' };
+      },
+    },
+    {
+      dataField: 'total',
+      text: 'Total matches',
+      sort: true,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return (
+          <div>
+            {item.total} <span className="blue">({item.aTotal}</span> +{' '}
+            <span className="red">{item.hTotal}</span>)
+          </div>
+        );
+      },
+      sortValue: cell => JSON.parse(cell).total,
+      headerStyle: (column, colIndex) => {
+        return { width: '175px' };
+      },
+    },
+    {
+      dataField: 'wins',
+      text: 'Wins',
+      sort: true,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return (
+          <div>
+            {item.wins} <span className="blue">({item.aWins}</span> +{' '}
+            <span className="red">{item.hWins}</span>)
+          </div>
+        );
+      },
+      sortValue: cell => JSON.parse(cell).wins,
+      headerStyle: (column, colIndex) => {
+        return { width: '175px' };
+      },
+    },
+    {
+      dataField: 'losses',
+      text: 'Losses',
+      sort: true,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return (
+          <div>
+            {item.total - item.wins}{' '}
+            <span className="blue">({item.aTotal - item.aWins}</span> +{' '}
+            <span className="red">{item.hTotal - item.hWins}</span>)
+          </div>
+        );
+      },
+      sortValue: cell => {
+        const item = JSON.parse(cell);
+        return item.total - item.wins;
+      },
+      headerStyle: (column, colIndex) => {
+        return { width: '175px' };
+      },
+    },
+    {
+      dataField: 'percent',
+      text: '%',
+      sort: true,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return <div>{((item.wins / item.total) * 100).toFixed(1)}</div>;
+      },
+      sortValue: cell => {
+        const item = JSON.parse(cell);
+        return item.wins / item.total;
+      },
+      headerStyle: (column, colIndex) => {
+        return { width: '90px' };
+      },
+    },
+    {
+      dataField: 'aPercent',
+      text: '% (A)',
+      sort: true,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return (
+          <div className="blue">
+            {item.aTotal !== 0
+              ? ((item.aWins / item.aTotal) * 100).toFixed(1)
+              : '-'}
+          </div>
+        );
+      },
+      sortValue: cell => {
+        const item = JSON.parse(cell);
+        return item.aTotal !== 0 ? item.aWins / item.aTotal : -1;
+      },
+      headerStyle: (column, colIndex) => {
+        return { width: '90px' };
+      },
+    },
+    {
+      dataField: 'hPercent',
+      text: '% (H)',
+      sort: true,
+      formatter: cell => {
+        const item = JSON.parse(cell);
+        return (
+          <div className="red">
+            {item.hTotal !== 0
+              ? ((item.hWins / item.hTotal) * 100).toFixed(1)
+              : '-'}
+          </div>
+        );
+      },
+      sortValue: cell => {
+        const item = JSON.parse(cell);
+        return item.hTotal !== 0 ? item.hWins / item.hTotal : -1;
+      },
+      headerStyle: (column, colIndex) => {
+        return { width: '90px' };
+      },
+    },
+  ];
+
+  const content = statsForEachComposition.map(item => {
+    return {
+      composition: item.comp,
+      total: JSON.stringify({
+        total: item.total,
+        aTotal: item.aTotal,
+        hTotal: item.hTotal,
+      }),
+      wins: JSON.stringify({
+        wins: item.wins,
+        aWins: item.aWins,
+        hWins: item.hWins,
+      }),
+      losses: JSON.stringify({
+        total: item.total,
+        wins: item.wins,
+        aTotal: item.aTotal,
+        aWins: item.aWins,
+        hTotal: item.hTotal,
+        hWins: item.hWins,
+      }),
+      percent: JSON.stringify({
+        wins: item.wins,
+        total: item.total,
+      }),
+      aPercent: JSON.stringify({
+        aTotal: item.aTotal,
+        aWins: item.aWins,
+      }),
+      hPercent: JSON.stringify({
+        hTotal: item.hTotal,
+        hWins: item.hWins,
+      }),
+    };
+  });
+
   return (
     <>
       <div className="App">
@@ -228,7 +395,7 @@ export default function App() {
             <Nav
               variant="pills"
               defaultActiveKey="all"
-              onSelect={(eventKey, _) => {
+              onSelect={eventKey => {
                 setSeason(eventKey);
               }}
             >
@@ -249,56 +416,20 @@ export default function App() {
               </Nav.Item>
             </Nav>
             <br />{' '}
-            <Table striped bordered hover className="data-table">
-              <thead>
-                <tr key={'head'}>
-                  <th>Enemy composition</th>
-                  <th>Total matches</th>
-                  <th>Wins</th>
-                  <th>Losses</th>
-                  <th>Ratio</th>
-                </tr>
-              </thead>
-              <tbody>
-                {statsForEachComposition.map((item, _) => (
-                  <tr key={item.comp}>
-                    <td>{item.comp}</td>
-                    <td>
-                      {item.total} (<span className="green">{item.aTotal}</span>{' '}
-                      + <span className="red">{item.hTotal}</span>)
-                    </td>
-                    <td>
-                      {item.wins} (<span className="green">{item.aWins}</span> +{' '}
-                      <span className="red">{item.hWins}</span>)
-                    </td>
-                    <td>
-                      {item.total - item.wins} (
-                      <span className="green">{item.aTotal - item.aWins}</span>{' '}
-                      + <span className="red">{item.hTotal - item.hWins}</span>)
-                    </td>
-                    <td>
-                      {(item.wins / item.total).toFixed(2)} (
-                      <span className="green">
-                        {item.aTotal !== 0
-                          ? (item.aWins / item.aTotal).toFixed(2)
-                          : '-'}
-                      </span>{' '}
-                      /{' '}
-                      <span className="red">
-                        {item.hTotal !== 0
-                          ? (item.hWins / item.hTotal).toFixed(2)
-                          : '-'}
-                      </span>
-                      )
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
             <p>
-              <span className="green">Green = Alliance</span>{' '}
-              <span className="red">Red = Horde</span>
+              <span className="blue">Blue = vs Alliance</span>{' '}
+              <span className="red">Red = vs Horde</span>
             </p>
+            <BootstrapTable
+              keyField="composition"
+              data={content}
+              columns={columns}
+              bootstrap4={true}
+              striped={true}
+              bordered={true}
+              hover={true}
+              classes={'data-table'}
+            />
             <Container>
               <BootstrapRow
                 xs={1}
@@ -392,10 +523,10 @@ export default function App() {
           margin-top: 10px;
         }
         .red {
-          color: red;
+          color: #dc3545;
         }
-        .green {
-          color: green;
+        .blue {
+          color: #0dcaf0;
         }
         .alerts-onboarding {
           margin-top: 100px;
