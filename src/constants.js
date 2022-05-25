@@ -26,3 +26,6 @@ export const ALL_CLASSES = [
   'MAGE',
   'WARLOCK',
 ];
+
+export const DEFAULT_SEASONS = ['s1', 's2', 's3', 's4'];
+export const DEFAULT_BRACKETS = ['2s'];

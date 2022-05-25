@@ -62,6 +62,22 @@ export class Row {
     this.enemyFaction = row[47];
   }
 
+  getComposition = brackets => {
+    // We could have added all 5 classes and then filter out falsy values, but it would not be resilient to "ghost player" bugs
+    let arr = [this.enemyPlayerClass1, this.enemyPlayerClass2];
+    if (brackets.includes('5s'))
+      arr.push(
+        this.enemyPlayerClass3,
+        this.enemyPlayerClass4,
+        this.enemyPlayerClass5
+      );
+    else if (brackets.includes('3s')) arr.push(this.enemyPlayerClass3);
+    return arr
+      .filter(it => !!it)
+      .sort((a, b) => a.localeCompare(b))
+      .join('+');
+  };
+
   won = () =>
     (this.teamColor &&
       this.winnerColor &&
@@ -75,24 +91,37 @@ export class Row {
     this.isRanked === 'NO';
 
   isRowClean = () =>
+    this.teamPlayerName1 &&
+    this.teamPlayerName2 &&
     this.enemyPlayerClass1 &&
     this.enemyPlayerClass2 &&
     this.enemyFaction &&
-    this.teamPlayerName1 &&
-    this.teamPlayerName2 &&
     ((this.teamColor && this.winnerColor) || !isNaN(this.diffRating)) &&
     this.isValidSeason();
 
-  matchSummary = () => {
-    const outcome = this.won() ? 'Victory' : 'Defeat';
-    const mmr = this.mmr ? ` at ${this.mmr} MMR` : '';
-    const enemies = `${enemy(
-      this.enemyPlayerName1,
-      this.enemyPlayerClass1
-    )} and ${enemy(this.enemyPlayerName2, this.enemyPlayerClass2)}`;
-    return `${outcome} as ${this.teamPlayerName1}/${this.teamPlayerName2} vs ${enemies}${mmr}`;
-    // could also have shown isRanked/diffRating, day (endTime), zoneId...
-  };
+  is2sData = () =>
+    !this.teamPlayerName3 &&
+    !this.teamPlayerClass3 && // TODO: was previously name only, any reason?
+    !this.teamPlayerName4 &&
+    !this.teamPlayerClass4 &&
+    !this.teamPlayerName5 &&
+    !this.teamPlayerClass5;
+
+  is3sData = () =>
+    this.teamPlayerName3 &&
+    this.teamPlayerClass3 &&
+    !this.teamPlayerName4 &&
+    !this.teamPlayerClass4 &&
+    !this.teamPlayerName5 &&
+    !this.teamPlayerClass5;
+
+  is5sData = () =>
+    this.teamPlayerName3 &&
+    this.teamPlayerClass3 &&
+    this.teamPlayerName4 &&
+    this.teamPlayerClass4 &&
+    this.teamPlayerName5 &&
+    this.teamPlayerClass5;
 
   isSeasonOne() {
     return this.startTime > SEASON_ONE_START && this.startTime < SEASON_ONE_END;
@@ -120,4 +149,35 @@ export class Row {
       this.isSeasonFour()
     );
   }
+
+  matchSummary = () => {
+    const outcome = this.won() ? 'Victory' : 'Defeat';
+    const mmr = this.mmr ? ` at ${this.mmr} MMR` : '';
+    const enemies = this.enemies();
+    return `${outcome} as ${this.allies()} vs ${enemies}${mmr}`;
+    // could also have shown isRanked/diffRating, day (endTime), zoneId...
+  };
+
+  allies = () =>
+    [
+      this.teamPlayerName1,
+      this.teamPlayerName2,
+      this.teamPlayerName3,
+      this.teamPlayerName4,
+      this.teamPlayerName5,
+    ]
+      .filter(a => !!a)
+      .join('/');
+
+  enemies = () => {
+    const enemies = [
+      enemy(this.enemyPlayerName1, this.enemyPlayerClass1),
+      enemy(this.enemyPlayerName2, this.enemyPlayerClass2),
+      enemy(this.enemyPlayerName3, this.enemyPlayerClass3),
+      enemy(this.enemyPlayerName4, this.enemyPlayerClass4),
+      enemy(this.enemyPlayerName5, this.enemyPlayerClass5),
+    ];
+
+    return enemies.filter(e => !!e).join(' and ');
+  };
 }
