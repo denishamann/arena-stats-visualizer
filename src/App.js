@@ -17,20 +17,7 @@ import { computeBadges } from './badgeLogic';
 import { timestampsOk } from './constants';
 import { Row } from './row';
 import BootstrapTable from 'react-bootstrap-table-next';
-import alliance from './icons/alliance.png';
-import horde from './icons/horde.png';
-import github from './icons/github.png';
-import curse from './icons/curse.webp';
-import warrior from './icons/warrior.webp';
-import paladin from './icons/paladin.webp';
-import hunter from './icons/hunter.webp';
-import shaman from './icons/shaman.webp';
-import rogue from './icons/rogue.webp';
-import druid from './icons/druid.webp';
-import priest from './icons/priest.webp';
-import mage from './icons/mage.webp';
-import warlock from './icons/warlock.webp';
-import unknown from './icons/unknown.webp';
+import * as icons from './icons';
 
 export default function App() {
   // React state
@@ -278,7 +265,13 @@ export default function App() {
       text: '% (A)',
       headerFormatter: () => (
         <div>
-          <img src={alliance} width={'24'} height={'24'} alt={'alliance'} /> %
+          <img
+            src={icons.alliance}
+            width={'24'}
+            height={'24'}
+            alt={'alliance'}
+          />{' '}
+          %
         </div>
       ),
       sort: true,
@@ -305,7 +298,7 @@ export default function App() {
       text: '% (H)',
       headerFormatter: () => (
         <div>
-          <img src={horde} width={'24'} height={'24'} alt={'horde'} /> %
+          <img src={icons.horde} width={'24'} height={'24'} alt={'horde'} /> %
         </div>
       ),
       sort: true,
@@ -368,25 +361,25 @@ export default function App() {
   const classIcon = clazz => {
     switch (clazz) {
       case 'WARRIOR':
-        return warrior;
+        return icons.warrior;
       case 'PALADIN':
-        return paladin;
+        return icons.paladin;
       case 'HUNTER':
-        return hunter;
+        return icons.hunter;
       case 'SHAMAN':
-        return shaman;
+        return icons.shaman;
       case 'ROGUE':
-        return rogue;
+        return icons.rogue;
       case 'DRUID':
-        return druid;
+        return icons.druid;
       case 'PRIEST':
-        return priest;
+        return icons.priest;
       case 'MAGE':
-        return mage;
+        return icons.mage;
       case 'WARLOCK':
-        return warlock;
+        return icons.warlock;
       default:
-        return unknown;
+        return icons.unknown;
     }
   };
 
@@ -400,7 +393,12 @@ export default function App() {
 
           <Stack className="float-end">
             <div>
-              <img src={github} width={'28'} height={'24'} alt={'github'} />
+              <img
+                src={icons.github}
+                width={'28'}
+                height={'24'}
+                alt={'github'}
+              />
               Contribute to the tool{' '}
               <a
                 href="https://github.com/denishamann/arena-stats-tbc-visualizer"
@@ -410,7 +408,12 @@ export default function App() {
               </a>
             </div>
             <div>
-              <img src={github} width={'28'} height={'24'} alt={'github'} />
+              <img
+                src={icons.github}
+                width={'28'}
+                height={'24'}
+                alt={'github'}
+              />
               Contribute to the addon{' '}
               <a
                 href="https://github.com/denishamann/ArenaStatsTBC"
@@ -421,7 +424,7 @@ export default function App() {
             </div>
             <div>
               <img
-                src={curse}
+                src={icons.curse}
                 width={'20'}
                 height={'20'}
                 alt={'curse'}
@@ -529,7 +532,7 @@ export default function App() {
                     <Card
                       key={badge.title}
                       border={badge.appearance}
-                      style={{ width: '18rem' }}
+                      style={{ height: '100%' }}
                     >
                       <Card.Header as="h5">{badge.title}</Card.Header>
                       <Card.Body>
