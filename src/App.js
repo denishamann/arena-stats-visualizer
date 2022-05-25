@@ -17,6 +17,7 @@ import { computeBadges } from './badgeLogic';
 import { timestampsOk } from './constants';
 import { Row } from './row';
 import BootstrapTable from 'react-bootstrap-table-next';
+import * as icons from './icons';
 
 export default function App() {
   // React state
@@ -164,7 +165,22 @@ export default function App() {
       dataField: 'composition',
       text: 'Enemy composition',
       sort: true,
-      formatter: cell => cell,
+      formatter: cell => {
+        const classes = cell.split('+');
+        return (
+          <div key={cell}>
+            {classes.map((clazz, idx) => (
+              <img
+                key={idx + clazz}
+                src={classIcon(clazz)}
+                width={'32'}
+                height={'32'}
+                alt={clazz}
+              />
+            ))}
+          </div>
+        );
+      },
       sortValue: cell => cell,
       headerStyle: (column, colIndex) => {
         return { width: '200px' };
@@ -247,6 +263,17 @@ export default function App() {
     {
       dataField: 'aPercent',
       text: '% (A)',
+      headerFormatter: () => (
+        <div>
+          <img
+            src={icons.alliance}
+            width={'24'}
+            height={'24'}
+            alt={'alliance'}
+          />{' '}
+          %
+        </div>
+      ),
       sort: true,
       formatter: cell => {
         const item = JSON.parse(cell);
@@ -269,6 +296,11 @@ export default function App() {
     {
       dataField: 'hPercent',
       text: '% (H)',
+      headerFormatter: () => (
+        <div>
+          <img src={icons.horde} width={'24'} height={'24'} alt={'horde'} /> %
+        </div>
+      ),
       sort: true,
       formatter: cell => {
         const item = JSON.parse(cell);
@@ -326,6 +358,31 @@ export default function App() {
     };
   });
 
+  const classIcon = clazz => {
+    switch (clazz) {
+      case 'WARRIOR':
+        return icons.warrior;
+      case 'PALADIN':
+        return icons.paladin;
+      case 'HUNTER':
+        return icons.hunter;
+      case 'SHAMAN':
+        return icons.shaman;
+      case 'ROGUE':
+        return icons.rogue;
+      case 'DRUID':
+        return icons.druid;
+      case 'PRIEST':
+        return icons.priest;
+      case 'MAGE':
+        return icons.mage;
+      case 'WARLOCK':
+        return icons.warlock;
+      default:
+        return icons.unknown;
+    }
+  };
+
   return (
     <>
       <div className="App">
@@ -336,19 +393,49 @@ export default function App() {
 
           <Stack className="float-end">
             <div>
+              <img
+                src={icons.github}
+                width={'28'}
+                height={'24'}
+                alt={'github'}
+              />
               Contribute to the tool{' '}
-              <a href="https://github.com/denishamann/arena-stats-tbc-visualizer">
-                here
+              <a
+                href="https://github.com/denishamann/arena-stats-tbc-visualizer"
+                target={'_blank'}
+              >
+                on Github
               </a>
             </div>
             <div>
+              <img
+                src={icons.github}
+                width={'28'}
+                height={'24'}
+                alt={'github'}
+              />
               Contribute to the addon{' '}
-              <a href="https://github.com/denishamann/ArenaStatsTBC">here</a>
+              <a
+                href="https://github.com/denishamann/ArenaStatsTBC"
+                target={'_blank'}
+              >
+                on Github
+              </a>
             </div>
             <div>
-              Get the addon on Curseforge{' '}
-              <a href="https://www.curseforge.com/wow/addons/arenastats-tbc">
-                here
+              <img
+                src={icons.curse}
+                width={'20'}
+                height={'20'}
+                alt={'curse'}
+                style={{ marginLeft: '5px', marginRight: '3px' }}
+              />
+              Get the addon{' '}
+              <a
+                href="https://www.curseforge.com/wow/addons/arenastats-tbc"
+                target={'_blank'}
+              >
+                on CurseForge
               </a>
             </div>
           </Stack>
@@ -445,7 +532,7 @@ export default function App() {
                     <Card
                       key={badge.title}
                       border={badge.appearance}
-                      style={{ width: '18rem' }}
+                      style={{ height: '100%' }}
                     >
                       <Card.Header as="h5">{badge.title}</Card.Header>
                       <Card.Body>
@@ -521,6 +608,7 @@ export default function App() {
         }
         .data-table {
           margin-top: 10px;
+          text-align: center;
         }
         .red {
           color: #dc3545;
