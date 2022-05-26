@@ -15,7 +15,12 @@ import {
   ToggleButtonGroup,
 } from 'react-bootstrap';
 import { computeBadges } from './badgeLogic';
-import { DEFAULT_BRACKETS, DEFAULT_SEASONS, timestampsOk } from './constants';
+import {
+  ALL_CLASSES,
+  DEFAULT_BRACKETS,
+  DEFAULT_SEASONS,
+  timestampsOk,
+} from './constants';
 import { Row } from './row';
 import BootstrapTable from 'react-bootstrap-table-next';
 import * as icons from './icons';
@@ -43,7 +48,10 @@ export default function App() {
 
   // Import logic - compute state based on imported string
   const importConfirmed = () => {
-    const result = Papa.parse(importString).data.map(row => new Row(row));
+    const parsed = Papa.parse(importString).data;
+    const result = parsed.flatMap(row =>
+      row.length > 1 ? [new Row(row)] : []
+    ); // skip empty lines in input string
     const dataWithoutSkirm = result.filter(row => !row.isTitleOrSkirmish());
     const cleanData = cleanCorruptedData(dataWithoutSkirm);
     setCorruptedCount(dataWithoutSkirm.length - cleanData.length);
@@ -108,9 +116,12 @@ export default function App() {
   const getAllPossibleCompositions = data => {
     const compositions = new Set();
     data.forEach(row => {
-      compositions.add(row.getComposition(brackets));
+      const comp = row.getComposition(brackets);
+      if (comp !== '') {
+        compositions.add(comp);
+      }
     });
-    return Array.from(compositions).sort((a, b) => a.localeCompare(b));
+    return Array.from(compositions).sort((a, b) => a.localeCompare(b)); // this .sort is useless; it will be re-sorted by wins anyway
   };
 
   const getStatsForEachComposition = (data, possibleCompositions) => {
@@ -128,7 +139,7 @@ export default function App() {
 
     data.forEach(row => {
       const index = stats.findIndex(
-        s => s.comp === row.getComposition(brackets)
+        s => s.comp === row.getComposition(brackets) // empty comp won't match anything
       );
       if (index !== -1) {
         stats[index].total = stats[index].total + 1;
@@ -176,7 +187,21 @@ export default function App() {
           </div>
         );
       },
-      sortValue: cell => cell,
+      sortValue: cell => {
+        // sort by bracket (2s -> 3s -> 5s -> unknown bracket/unknown class included) and then by ALL_CLASSES order
+        const classes = cell.split('+');
+        const firstCode = 'A'.charCodeAt(0); // 65
+        const indices = classes.map(clazz =>
+          ALL_CLASSES.indexOf(clazz) === -1
+            ? 'Z'
+            : String.fromCharCode(firstCode + ALL_CLASSES.indexOf(clazz))
+        ); // 'A' for warrior, 'B' for hunter... and 'Z' for unknown
+        return (
+          (indices.length === 0 || indices.includes('Z')
+            ? 'Z'
+            : '' + indices.length) + indices.join('')
+        ); // prefix with '2', '3', '5' or 'Z' depending on the bracket
+      },
       headerStyle: (column, colIndex) => {
         return { width: '200px' };
       },

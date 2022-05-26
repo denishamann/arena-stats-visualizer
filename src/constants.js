@@ -17,14 +17,14 @@ export const timestampsOk = () =>
 
 export const ALL_CLASSES = [
   'WARRIOR',
-  'PALADIN',
   'HUNTER',
-  'SHAMAN',
   'ROGUE',
-  'DRUID',
-  'PRIEST',
   'MAGE',
   'WARLOCK',
+  'PALADIN',
+  'SHAMAN',
+  'DRUID',
+  'PRIEST',
 ];
 
 export const DEFAULT_SEASONS = ['s1', 's2', 's3', 's4'];
