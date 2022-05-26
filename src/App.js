@@ -138,26 +138,29 @@ export default function App() {
     });
 
     data.forEach(row => {
-      const index = stats.findIndex(
-        s => s.comp === row.getComposition(brackets) // empty comp won't match anything
-      );
-      if (index !== -1) {
-        stats[index].total = stats[index].total + 1;
-        if (row.enemyFaction === 'ALLIANCE') {
-          stats[index].aTotal = stats[index].aTotal + 1;
-        } else if (row.enemyFaction === 'HORDE') {
-          stats[index].hTotal = stats[index].hTotal + 1;
-        }
-        if (row.won()) {
-          stats[index].wins = stats[index].wins + 1;
+      const comp = row.getComposition(brackets)
+      if (comp !== '') {
+        const index = stats.findIndex(
+          s => s.comp === comp
+        );
+        if (index !== -1) {
+          stats[index].total = stats[index].total + 1;
           if (row.enemyFaction === 'ALLIANCE') {
-            stats[index].aWins = stats[index].aWins + 1;
+            stats[index].aTotal = stats[index].aTotal + 1;
           } else if (row.enemyFaction === 'HORDE') {
-            stats[index].hWins = stats[index].hWins + 1;
+            stats[index].hTotal = stats[index].hTotal + 1;
           }
+          if (row.won()) {
+            stats[index].wins = stats[index].wins + 1;
+            if (row.enemyFaction === 'ALLIANCE') {
+              stats[index].aWins = stats[index].aWins + 1;
+            } else if (row.enemyFaction === 'HORDE') {
+              stats[index].hWins = stats[index].hWins + 1;
+            }
+          }
+        } else {
+          console.log('Error with row', row);
         }
-      } else {
-        console.log('Error with row', row);
       }
     });
 
