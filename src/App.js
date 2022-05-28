@@ -24,6 +24,7 @@ import {
 import { Row } from './row';
 import BootstrapTable from 'react-bootstrap-table-next';
 import * as icons from './icons';
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 
 export default function App() {
   // React state
@@ -496,17 +497,18 @@ export default function App() {
               type="checkbox"
               defaultValue={DEFAULT_SEASONS}
               onChange={setSeasons}
+              className='as-toggle-button-groups'
             >
-              <ToggleButton id="season-1" value={'s1'}>
+              <ToggleButton id="season-1" value={'s1'} variant={'outline-primary'}>
                 Season 1
               </ToggleButton>
-              <ToggleButton id="season-2" value={'s2'}>
+              <ToggleButton id="season-2" value={'s2'} variant={'outline-primary'}>
                 Season 2
               </ToggleButton>
-              <ToggleButton id="season-3" value={'s3'}>
+              <ToggleButton id="season-3" value={'s3'} variant={'outline-primary'}>
                 Season 3
               </ToggleButton>
-              <ToggleButton id="season-4" value={'s4'}>
+              <ToggleButton id="season-4" value={'s4'} variant={'outline-primary'}>
                 Season 4
               </ToggleButton>
             </ToggleButtonGroup>
@@ -515,14 +517,15 @@ export default function App() {
               type="checkbox"
               defaultValue={DEFAULT_BRACKETS}
               onChange={setBrackets}
+              className='as-toggle-button-groups'
             >
-              <ToggleButton id="bracket-2s" value={'2s'}>
+              <ToggleButton id="bracket-2s" value={'2s'} variant={'outline-primary'}>
                 2v2
               </ToggleButton>
-              <ToggleButton id="bracket-3s" value={'3s'}>
+              <ToggleButton id="bracket-3s" value={'3s'} variant={'outline-primary'}>
                 3v3
               </ToggleButton>
-              <ToggleButton id="bracket-5s" value={'5s'}>
+              <ToggleButton id="bracket-5s" value={'5s'} variant={'outline-primary'}>
                 5v5
               </ToggleButton>
             </ToggleButtonGroup>
@@ -634,6 +637,9 @@ export default function App() {
           margin-top: 10px;
           text-align: center;
         }
+        .data-table th:hover {
+          background-color:aliceblue
+        }
         .red {
           color: #dc3545;
         }
@@ -642,6 +648,21 @@ export default function App() {
         }
         .alerts-onboarding {
           margin-top: 100px;
+        }
+        .as-toggle-button-groups {
+          margin: 10px 0 10px 0;
+        }
+        .as-toggle-button-groups > label {
+          margin: 0 10px 0 0;
+          border-radius: 0.25rem!important;
+        }
+        .as-toggle-button-groups > label:hover {
+          background-color: lightsteelblue;
+          color: white;
+        }
+        .as-toggle-button-groups > .btn-check:checked + .btn:hover {
+          background-color: cornflowerblue;
+          color: lightsteelblue;
         }
       `}</style>
     </>
