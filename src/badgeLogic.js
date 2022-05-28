@@ -2,7 +2,7 @@ import { MyBadge } from './myBadge';
 import maxBy from 'lodash/maxBy';
 import minBy from 'lodash/minBy';
 import { ALL_CLASSES } from './constants';
-import { enemy, longestSequence, mean, median, secondsToHms } from './util';
+import { longestSequence, mean, median, secondsToHms } from './util';
 
 export const computeBadges = data => {
   let myBadges = [];
@@ -103,7 +103,7 @@ export const computeBadges = data => {
     myBadges.push(
       new MyBadge(
         `You peaked at ${highestRatingMatch.newTeamRating} team rating`,
-        `As ${highestRatingMatch.teamPlayerName1}/${highestRatingMatch.teamPlayerName2}`,
+        `As ${highestRatingMatch.allies()}`,
         'success'
       )
     );
@@ -112,7 +112,7 @@ export const computeBadges = data => {
     myBadges.push(
       new MyBadge(
         `You peaked at ${highestMmrMatch.mmr} MMR`,
-        `As ${highestMmrMatch.teamPlayerName1}/${highestMmrMatch.teamPlayerName2}`,
+        `As ${highestMmrMatch.allies()}`,
         'success'
       )
     );
@@ -120,16 +120,8 @@ export const computeBadges = data => {
   if (highestRatingDefeatedMatch) {
     myBadges.push(
       new MyBadge(
-        `You defeated an opponent As ${highestRatingDefeatedMatch.enemyNewTeamRating} team rating`,
-        `As ${highestRatingDefeatedMatch.teamPlayerName1}/${
-          highestRatingDefeatedMatch.teamPlayerName2
-        } against ${enemy(
-          highestRatingDefeatedMatch.enemyPlayerName1,
-          highestRatingDefeatedMatch.enemyPlayerClass1
-        )} and ${enemy(
-          highestRatingDefeatedMatch.enemyPlayerName2,
-          highestRatingDefeatedMatch.enemyPlayerClass2
-        )}`,
+        `You defeated an opponent with ${highestRatingDefeatedMatch.enemyNewTeamRating} team rating`,
+        `As ${highestRatingDefeatedMatch.allies()} against ${highestRatingDefeatedMatch.enemies()}`,
         'success'
       )
     );
@@ -138,15 +130,7 @@ export const computeBadges = data => {
     myBadges.push(
       new MyBadge(
         `You defeated an opponent with ${highestMmrDefeatedMatch.enemyMmr} MMR`,
-        `As ${highestMmrDefeatedMatch.teamPlayerName1}/${
-          highestMmrDefeatedMatch.teamPlayerName2
-        } against ${enemy(
-          highestMmrDefeatedMatch.enemyPlayerName1,
-          highestMmrDefeatedMatch.enemyPlayerClass1
-        )} and ${enemy(
-          highestMmrDefeatedMatch.enemyPlayerName2,
-          highestMmrDefeatedMatch.enemyPlayerClass2
-        )}`,
+        `As ${highestMmrDefeatedMatch.allies()} against ${highestMmrDefeatedMatch.enemies()}`,
         'success'
       )
     );

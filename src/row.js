@@ -1,4 +1,5 @@
 import {
+  ALL_CLASSES,
   SEASON_FOUR_START,
   SEASON_ONE_END,
   SEASON_ONE_START,
@@ -62,6 +63,32 @@ export class Row {
     this.enemyFaction = row[47];
   }
 
+  // Returns an string containing uppercase classes joined by a '+', or an empty string if the composition is invalid!
+  getComposition = brackets => {
+    // We could have added all 5 classes and then filter out falsy values, but it would not be resilient to "ghost player" bugs. isValidNComp addresses that problem. Ghost player entries are therefore ignored.
+    const enemyPlayerClasses = [];
+    if (this.isValid5sComp() && brackets.includes('5s')) {
+      enemyPlayerClasses.push(
+        this.enemyPlayerClass1,
+        this.enemyPlayerClass2,
+        this.enemyPlayerClass3,
+        this.enemyPlayerClass4,
+        this.enemyPlayerClass5
+      );
+    } else if (this.isValid3sComp() && brackets.includes('3s')) {
+      enemyPlayerClasses.push(
+        this.enemyPlayerClass1,
+        this.enemyPlayerClass2,
+        this.enemyPlayerClass3
+      );
+    } else if (this.isValid2sComp() && brackets.includes('2s')) {
+      enemyPlayerClasses.push(this.enemyPlayerClass1, this.enemyPlayerClass2);
+    }
+    return enemyPlayerClasses
+      .sort((a, b) => ALL_CLASSES.indexOf(a) - ALL_CLASSES.indexOf(b))
+      .join('+');
+  };
+
   won = () =>
     (this.teamColor &&
       this.winnerColor &&
@@ -74,25 +101,67 @@ export class Row {
     this.enemyFaction === 'enemyFaction' ||
     this.isRanked === 'NO';
 
+  // check a few basic fields and filter out completely corrupted data
   isRowClean = () =>
-    this.enemyPlayerClass1 &&
-    this.enemyPlayerClass2 &&
-    this.enemyFaction &&
     this.teamPlayerName1 &&
+    this.teamPlayerClass1 &&
     this.teamPlayerName2 &&
+    this.teamPlayerClass2 &&
+    this.enemyPlayerClass1 &&
+    this.enemyFaction &&
     ((this.teamColor && this.winnerColor) || !isNaN(this.diffRating)) &&
     this.isValidSeason();
 
-  matchSummary = () => {
-    const outcome = this.won() ? 'Victory' : 'Defeat';
-    const mmr = this.mmr ? ` at ${this.mmr} MMR` : '';
-    const enemies = `${enemy(
-      this.enemyPlayerName1,
-      this.enemyPlayerClass1
-    )} and ${enemy(this.enemyPlayerName2, this.enemyPlayerClass2)}`;
-    return `${outcome} as ${this.teamPlayerName1}/${this.teamPlayerName2} vs ${enemies}${mmr}`;
-    // could also have shown isRanked/diffRating, day (endTime), zoneId...
-  };
+  // isNsData checks own team data. If one of your teammates is missing (e.g. didn't enter the arena), the match won't be considered at all for anything
+  // isValidNsComp checks enemy data. If an enemy is missing (e.g. didn't enter the arena), or if there is a ghost player (addon bug), the match will be included in win rates and badges system, but not in the compositions table
+
+  is2sData = () =>
+    !this.teamPlayerName3 &&
+    !this.teamPlayerClass3 &&
+    !this.teamPlayerName4 &&
+    !this.teamPlayerClass4 &&
+    !this.teamPlayerName5 &&
+    !this.teamPlayerClass5;
+
+  isValid2sComp = () =>
+    this.is2sData &&
+    this.enemyPlayerClass1 &&
+    this.enemyPlayerClass2 &&
+    !this.enemyPlayerClass3 &&
+    !this.enemyPlayerClass4 &&
+    !this.enemyPlayerClass5;
+
+  is3sData = () =>
+    this.teamPlayerName3 &&
+    this.teamPlayerClass3 &&
+    !this.teamPlayerName4 &&
+    !this.teamPlayerClass4 &&
+    !this.teamPlayerName5 &&
+    !this.teamPlayerClass5;
+
+  isValid3sComp = () =>
+    this.is3sData &&
+    this.enemyPlayerClass1 &&
+    this.enemyPlayerClass2 &&
+    this.enemyPlayerClass3 &&
+    !this.enemyPlayerClass4 &&
+    !this.enemyPlayerClass5;
+
+  is5sData = () =>
+    this.teamPlayerName3 &&
+    this.teamPlayerClass3 &&
+    this.teamPlayerName4 &&
+    this.teamPlayerClass4 &&
+    this.teamPlayerName5 &&
+    this.teamPlayerClass5;
+
+  isValid5sComp = () =>
+    this.is5sData &&
+    this.enemyPlayerClass1 &&
+    this.enemyPlayerClass2 &&
+    this.enemyPlayerClass3 &&
+    this.enemyPlayerClass4 &&
+    this.enemyPlayerClass5;
 
   isSeasonOne() {
     return this.startTime > SEASON_ONE_START && this.startTime < SEASON_ONE_END;
@@ -120,4 +189,36 @@ export class Row {
       this.isSeasonFour()
     );
   }
+
+  matchSummary = () => {
+    const outcome = this.won() ? 'Victory' : 'Defeat';
+    const mmr = this.mmr ? ` at ${this.mmr} MMR` : '';
+    const enemies = this.enemies();
+    return `${outcome} as ${this.allies()} vs ${enemies}${mmr}`;
+    // could also have shown isRanked/diffRating, day (endTime), zoneId...
+  };
+
+  allies = () => {
+    const allies = [
+      this.teamPlayerName1,
+      this.teamPlayerName2,
+      this.teamPlayerName3,
+      this.teamPlayerName4,
+      this.teamPlayerName5,
+    ];
+
+    return allies.filter(a => !!a).join('/');
+  };
+
+  enemies = () => {
+    const enemies = [
+      enemy(this.enemyPlayerName1, this.enemyPlayerClass1),
+      enemy(this.enemyPlayerName2, this.enemyPlayerClass2),
+      enemy(this.enemyPlayerName3, this.enemyPlayerClass3),
+      enemy(this.enemyPlayerName4, this.enemyPlayerClass4),
+      enemy(this.enemyPlayerName5, this.enemyPlayerClass5),
+    ];
+
+    return enemies.filter(e => !!e).join(' and ');
+  };
 }

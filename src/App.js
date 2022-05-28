@@ -9,23 +9,31 @@ import {
   Container,
   Form,
   Modal,
-  Nav,
   Row as BootstrapRow,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
 } from 'react-bootstrap';
 import { computeBadges } from './badgeLogic';
-import { timestampsOk } from './constants';
+import {
+  ALL_CLASSES,
+  DEFAULT_BRACKETS,
+  DEFAULT_SEASONS,
+  timestampsOk,
+} from './constants';
 import { Row } from './row';
 import BootstrapTable from 'react-bootstrap-table-next';
 import * as icons from './icons';
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 
 export default function App() {
   // React state
   const [showModal, setShowModal] = useState(false);
   const [importString, setImportString] = useState('');
-  const [only2sData, setOnly2sData] = useState([]);
+  const [cleanData, setCleanData] = useState([]);
   const [corruptedCount, setCorruptedCount] = useState(0);
-  const [season, setSeason] = useState('all');
+  const [seasons, setSeasons] = useState(DEFAULT_SEASONS);
+  const [brackets, setBrackets] = useState(DEFAULT_BRACKETS);
 
   // Inferred state
   let totalMatches = 0;
@@ -41,12 +49,14 @@ export default function App() {
 
   // Import logic - compute state based on imported string
   const importConfirmed = () => {
-    const result = Papa.parse(importString).data.map(row => new Row(row));
+    const parsed = Papa.parse(importString).data;
+    const result = parsed.flatMap(row =>
+      row.length > 1 ? [new Row(row)] : []
+    ); // skip empty lines in input string
     const dataWithoutSkirm = result.filter(row => !row.isTitleOrSkirmish());
     const cleanData = cleanCorruptedData(dataWithoutSkirm);
     setCorruptedCount(dataWithoutSkirm.length - cleanData.length);
-    const only2sData = cleanNon2sData(cleanData);
-    setOnly2sData(only2sData);
+    setCleanData(cleanData);
     handleCloseModal();
   };
 
@@ -58,18 +68,17 @@ export default function App() {
     return data.filter(row => row.isRowClean());
   };
 
-  const cleanNon2sData = data => {
-    return data.filter(row => row.teamPlayerName3 === '');
-  };
-
   // Rendering logic - compute inferred state based on state (i.e. user inputs)
   const processState = () => {
-    if (only2sData.length) {
-      const seasonSpecificData = getSeasonSpecificData(only2sData);
-      const possibleCompositions =
-        getAllPossibleCompositions(seasonSpecificData);
+    if (cleanData.length) {
+      const seasonSpecificData = getSeasonSpecificData(cleanData);
+      const bracketAndSeasonSpecificData =
+        getBracketSpecificData(seasonSpecificData);
+      const possibleCompositions = getAllPossibleCompositions(
+        bracketAndSeasonSpecificData
+      );
       statsForEachComposition = getStatsForEachComposition(
-        seasonSpecificData,
+        bracketAndSeasonSpecificData,
         possibleCompositions
       );
 
@@ -82,38 +91,38 @@ export default function App() {
         0
       );
 
-      badges = computeBadges(seasonSpecificData);
+      badges = computeBadges(bracketAndSeasonSpecificData);
     }
   };
 
   const getSeasonSpecificData = data => {
-    switch (season) {
-      case 'all':
-        return data;
-      case '1':
-        return data.filter(row => row.isSeasonOne());
-      case '2':
-        return data.filter(row => row.isSeasonTwo());
-      case '3':
-        return data.filter(row => row.isSeasonThree());
-      case '4':
-        return data.filter(row => row.isSeasonFour());
-      default:
-        return data;
-    }
+    return data.filter(
+      row =>
+        (row.isSeasonOne() && seasons.includes('s1')) ||
+        (row.isSeasonTwo() && seasons.includes('s2')) ||
+        (row.isSeasonThree() && seasons.includes('s3')) ||
+        (row.isSeasonFour() && seasons.includes('s4'))
+    );
+  };
+
+  const getBracketSpecificData = data => {
+    return data.filter(
+      row =>
+        (row.is2sData() && brackets.includes('2s')) ||
+        (row.is3sData() && brackets.includes('3s')) ||
+        (row.is5sData() && brackets.includes('5s'))
+    );
   };
 
   const getAllPossibleCompositions = data => {
     const compositions = new Set();
     data.forEach(row => {
-      if (row.enemyPlayerClass1 && row.enemyPlayerClass2) {
-        const arr = [row.enemyPlayerClass1, row.enemyPlayerClass2].sort(
-          (a, b) => a.localeCompare(b)
-        );
-        compositions.add(`${arr[0]}+${arr[1]}`);
+      const comp = row.getComposition(brackets);
+      if (comp !== '') {
+        compositions.add(comp);
       }
     });
-    return Array.from(compositions).sort((a, b) => a.localeCompare(b));
+    return Array.from(compositions).sort((a, b) => a.localeCompare(b)); // this .sort is useless; it will be re-sorted by wins anyway
   };
 
   const getStatsForEachComposition = (data, possibleCompositions) => {
@@ -130,28 +139,29 @@ export default function App() {
     });
 
     data.forEach(row => {
-      const index = stats.findIndex(
-        s =>
-          s.comp === `${row.enemyPlayerClass1}+${row.enemyPlayerClass2}` ||
-          s.comp === `${row.enemyPlayerClass2}+${row.enemyPlayerClass1}`
-      );
-      if (index !== -1) {
-        stats[index].total = stats[index].total + 1;
-        if (row.enemyFaction === 'ALLIANCE') {
-          stats[index].aTotal = stats[index].aTotal + 1;
-        } else if (row.enemyFaction === 'HORDE') {
-          stats[index].hTotal = stats[index].hTotal + 1;
-        }
-        if (row.won()) {
-          stats[index].wins = stats[index].wins + 1;
+      const comp = row.getComposition(brackets)
+      if (comp !== '') {
+        const index = stats.findIndex(
+          s => s.comp === comp
+        );
+        if (index !== -1) {
+          stats[index].total = stats[index].total + 1;
           if (row.enemyFaction === 'ALLIANCE') {
-            stats[index].aWins = stats[index].aWins + 1;
+            stats[index].aTotal = stats[index].aTotal + 1;
           } else if (row.enemyFaction === 'HORDE') {
-            stats[index].hWins = stats[index].hWins + 1;
+            stats[index].hTotal = stats[index].hTotal + 1;
           }
+          if (row.won()) {
+            stats[index].wins = stats[index].wins + 1;
+            if (row.enemyFaction === 'ALLIANCE') {
+              stats[index].aWins = stats[index].aWins + 1;
+            } else if (row.enemyFaction === 'HORDE') {
+              stats[index].hWins = stats[index].hWins + 1;
+            }
+          }
+        } else {
+          console.log('Error with row', row);
         }
-      } else {
-        console.log('Error with row', row);
       }
     });
 
@@ -181,7 +191,21 @@ export default function App() {
           </div>
         );
       },
-      sortValue: cell => cell,
+      sortValue: cell => {
+        // sort by bracket (2s -> 3s -> 5s -> unknown bracket/unknown class included) and then by ALL_CLASSES order
+        const classes = cell.split('+');
+        const firstCode = 'A'.charCodeAt(0); // 65
+        const indices = classes.map(clazz =>
+          ALL_CLASSES.indexOf(clazz) === -1
+            ? 'Z'
+            : String.fromCharCode(firstCode + ALL_CLASSES.indexOf(clazz))
+        ); // 'A' for warrior, 'B' for hunter... and 'Z' for unknown
+        return (
+          (indices.length === 0 || indices.includes('Z')
+            ? 'Z'
+            : '' + indices.length) + indices.join('')
+        ); // prefix with '2', '3', '5' or 'Z' depending on the bracket
+      },
       headerStyle: (column, colIndex) => {
         return { width: '200px' };
       },
@@ -400,10 +424,7 @@ export default function App() {
                 alt={'github'}
               />
               Contribute to the tool{' '}
-              <a
-                href="https://github.com/denishamann/arena-stats-tbc-visualizer"
-                target={'_blank'}
-              >
+              <a href="https://github.com/denishamann/arena-stats-tbc-visualizer">
                 on Github
               </a>
             </div>
@@ -415,10 +436,7 @@ export default function App() {
                 alt={'github'}
               />
               Contribute to the addon{' '}
-              <a
-                href="https://github.com/denishamann/ArenaStatsTBC"
-                target={'_blank'}
-              >
+              <a href="https://github.com/denishamann/ArenaStatsTBC">
                 on Github
               </a>
             </div>
@@ -431,17 +449,14 @@ export default function App() {
                 style={{ marginLeft: '5px', marginRight: '3px' }}
               />
               Get the addon{' '}
-              <a
-                href="https://www.curseforge.com/wow/addons/arenastats-tbc"
-                target={'_blank'}
-              >
+              <a href="https://www.curseforge.com/wow/addons/arenastats-tbc">
                 on CurseForge
               </a>
             </div>
           </Stack>
         </Container>
 
-        {!only2sData.length ? (
+        {!cleanData.length ? (
           <Container className="alerts-onboarding">
             <Alert key={'alert-infos'} variant={'primary'}>
               <Alert.Heading>Notice</Alert.Heading>
@@ -452,12 +467,11 @@ export default function App() {
               the String, click on the "Import" button here, and paste it.
             </Alert>
             <Alert key={'alert-data'} variant={'warning'}>
-              It automatically removes all skirmishes and all non 2s matches.
-              Support for 3s and 5s is coming soon™
+              It automatically removes all skirmishes.
             </Alert>
             <Alert key={'alert-trimming'} variant={'warning'}>
               You will only see stats for matches played since you installed the
-              addon
+              addon.
             </Alert>
             <Alert key={'alert-leaving'} variant={'warning'}>
               If you want to leave a match in-game before it is ended, make sure
@@ -479,29 +493,42 @@ export default function App() {
             )}
             <br />
             <br />
-            <Nav
-              variant="pills"
-              defaultActiveKey="all"
-              onSelect={eventKey => {
-                setSeason(eventKey);
-              }}
+            <ToggleButtonGroup
+              type="checkbox"
+              defaultValue={DEFAULT_SEASONS}
+              onChange={setSeasons}
+              className='as-toggle-button-groups'
             >
-              <Nav.Item>
-                <Nav.Link eventKey="all">All seasons</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="1">Season 1</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="2">Season 2</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="3">Season 3</Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="4">Season 4</Nav.Link>
-              </Nav.Item>
-            </Nav>
+              <ToggleButton id="season-1" value={'s1'} variant={'outline-primary'}>
+                Season 1
+              </ToggleButton>
+              <ToggleButton id="season-2" value={'s2'} variant={'outline-primary'}>
+                Season 2
+              </ToggleButton>
+              <ToggleButton id="season-3" value={'s3'} variant={'outline-primary'}>
+                Season 3
+              </ToggleButton>
+              <ToggleButton id="season-4" value={'s4'} variant={'outline-primary'}>
+                Season 4
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <br />
+            <ToggleButtonGroup
+              type="checkbox"
+              defaultValue={DEFAULT_BRACKETS}
+              onChange={setBrackets}
+              className='as-toggle-button-groups'
+            >
+              <ToggleButton id="bracket-2s" value={'2s'} variant={'outline-primary'}>
+                2v2
+              </ToggleButton>
+              <ToggleButton id="bracket-3s" value={'3s'} variant={'outline-primary'}>
+                3v3
+              </ToggleButton>
+              <ToggleButton id="bracket-5s" value={'5s'} variant={'outline-primary'}>
+                5v5
+              </ToggleButton>
+            </ToggleButtonGroup>
             <br />{' '}
             <p>
               <span className="blue">Blue = vs Alliance</span>{' '}
@@ -548,8 +575,8 @@ export default function App() {
             <br />
             <p>
               Skipped <strong className="red">{corruptedCount}</strong>{' '}
-              unprocessable records (not only in 2s). Open console to inspect
-              them if needed.
+              unprocessable records (all seasons/brackets considered). Open
+              console to inspect them if needed.
             </p>
           </Container>
         )}
@@ -610,6 +637,9 @@ export default function App() {
           margin-top: 10px;
           text-align: center;
         }
+        .data-table th:hover {
+          background-color:aliceblue
+        }
         .red {
           color: #dc3545;
         }
@@ -618,6 +648,21 @@ export default function App() {
         }
         .alerts-onboarding {
           margin-top: 100px;
+        }
+        .as-toggle-button-groups {
+          margin: 10px 0 10px 0;
+        }
+        .as-toggle-button-groups > label {
+          margin: 0 10px 0 0;
+          border-radius: 0.25rem!important;
+        }
+        .as-toggle-button-groups > label:hover {
+          background-color: lightsteelblue;
+          color: white;
+        }
+        .as-toggle-button-groups > .btn-check:checked + .btn:hover {
+          background-color: cornflowerblue;
+          color: lightsteelblue;
         }
       `}</style>
     </>
