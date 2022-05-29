@@ -139,11 +139,9 @@ export default function App() {
     });
 
     data.forEach(row => {
-      const comp = row.getComposition(brackets)
+      const comp = row.getComposition(brackets);
       if (comp !== '') {
-        const index = stats.findIndex(
-          s => s.comp === comp
-        );
+        const index = stats.findIndex(s => s.comp === comp);
         if (index !== -1) {
           stats[index].total = stats[index].total + 1;
           if (row.enemyFaction === 'ALLIANCE') {
@@ -295,8 +293,7 @@ export default function App() {
             height={'24'}
             alt={'alliance'}
           />{' '}
-          %
-          {components.sortElement}
+          %{components.sortElement}
         </div>
       ),
       sort: true,
@@ -499,18 +496,34 @@ export default function App() {
               type="checkbox"
               defaultValue={DEFAULT_SEASONS}
               onChange={setSeasons}
-              className='as-toggle-button-groups'
+              className="as-toggle-button-groups"
             >
-              <ToggleButton id="season-1" value={'s1'} variant={'outline-primary'}>
+              <ToggleButton
+                id="season-1"
+                value={'s1'}
+                variant={'outline-primary'}
+              >
                 Season 1
               </ToggleButton>
-              <ToggleButton id="season-2" value={'s2'} variant={'outline-primary'}>
+              <ToggleButton
+                id="season-2"
+                value={'s2'}
+                variant={'outline-primary'}
+              >
                 Season 2
               </ToggleButton>
-              <ToggleButton id="season-3" value={'s3'} variant={'outline-primary'}>
+              <ToggleButton
+                id="season-3"
+                value={'s3'}
+                variant={'outline-primary'}
+              >
                 Season 3
               </ToggleButton>
-              <ToggleButton id="season-4" value={'s4'} variant={'outline-primary'}>
+              <ToggleButton
+                id="season-4"
+                value={'s4'}
+                variant={'outline-primary'}
+              >
                 Season 4
               </ToggleButton>
             </ToggleButtonGroup>
@@ -519,15 +532,27 @@ export default function App() {
               type="checkbox"
               defaultValue={DEFAULT_BRACKETS}
               onChange={setBrackets}
-              className='as-toggle-button-groups'
+              className="as-toggle-button-groups"
             >
-              <ToggleButton id="bracket-2s" value={'2s'} variant={'outline-primary'}>
+              <ToggleButton
+                id="bracket-2s"
+                value={'2s'}
+                variant={'outline-primary'}
+              >
                 2v2
               </ToggleButton>
-              <ToggleButton id="bracket-3s" value={'3s'} variant={'outline-primary'}>
+              <ToggleButton
+                id="bracket-3s"
+                value={'3s'}
+                variant={'outline-primary'}
+              >
                 3v3
               </ToggleButton>
-              <ToggleButton id="bracket-5s" value={'5s'} variant={'outline-primary'}>
+              <ToggleButton
+                id="bracket-5s"
+                value={'5s'}
+                variant={'outline-primary'}
+              >
                 5v5
               </ToggleButton>
             </ToggleButtonGroup>
@@ -540,7 +565,7 @@ export default function App() {
               keyField="composition"
               data={content}
               columns={columns}
-              defaultSorted={[{dataField: 'total', order: 'desc'}]}
+              defaultSorted={[{ dataField: 'total', order: 'desc' }]}
               bootstrap4={true}
               striped={true}
               bordered={true}
@@ -567,7 +592,15 @@ export default function App() {
                       <Card.Header as="h5">{badge.title}</Card.Header>
                       <Card.Body>
                         <Card.Text className="mb-2 text-muted">
-                          {badge.details}
+                          {badge.details ? (
+                            badge.details
+                          ) : (
+                            <ul className="sober">
+                              {badge.detailsArray.map(it => (
+                                <li>{it}</li>
+                              ))}
+                            </ul>
+                          )}
                         </Card.Text>
                       </Card.Body>
                     </Card>
@@ -641,7 +674,7 @@ export default function App() {
           text-align: center;
         }
         .data-table th:hover {
-          background-color:aliceblue
+          background-color: aliceblue;
         }
         .red {
           color: #dc3545;
@@ -657,7 +690,7 @@ export default function App() {
         }
         .as-toggle-button-groups > label {
           margin: 0 10px 0 0;
-          border-radius: 0.25rem!important;
+          border-radius: 0.25rem !important;
         }
         .as-toggle-button-groups > label:hover {
           background-color: lightsteelblue;
@@ -666,6 +699,10 @@ export default function App() {
         .as-toggle-button-groups > .btn-check:checked + .btn:hover {
           background-color: cornflowerblue;
           color: lightsteelblue;
+        }
+        ul.sober {
+          list-style-type: none;
+          padding-left: 3px;
         }
       `}</style>
     </>

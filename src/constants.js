@@ -27,5 +27,11 @@ export const ALL_CLASSES = [
   'PRIEST',
 ];
 
+export const ARENA_MAPS_BY_ID = {
+  3698: 'Nagrand Arena',
+  3702: "Blade's Edge Arena",
+  3968: 'Ruins of Lordaeron',
+};
+
 export const DEFAULT_SEASONS = ['s1', 's2', 's3', 's4'];
 export const DEFAULT_BRACKETS = ['2s'];

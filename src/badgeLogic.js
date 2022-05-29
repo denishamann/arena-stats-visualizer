@@ -1,7 +1,7 @@
 import { MyBadge } from './myBadge';
 import maxBy from 'lodash/maxBy';
 import minBy from 'lodash/minBy';
-import { ALL_CLASSES } from './constants';
+import { ALL_CLASSES, ARENA_MAPS_BY_ID } from './constants';
 import { longestSequence, mean, median, secondsToHms } from './util';
 
 export const computeBadges = data => {
@@ -61,11 +61,10 @@ export const computeBadges = data => {
   const medianDur = secondsToHms(median(data.map(row => row.duration)));
   if (meanDur || medianDur) {
     myBadges.push(
-      new MyBadge(
-        'Match duration trends',
-        `Mean match duration: ${meanDur}, Median match duration: ${medianDur}`,
-        'primary'
-      )
+      new MyBadge('Match duration trends', '', 'primary', [
+        `Mean match duration: ${meanDur}`,
+        `Median match duration: ${medianDur}`,
+      ])
     );
   }
   const longestWinningStreak = longestSequence(
@@ -135,6 +134,21 @@ export const computeBadges = data => {
       )
     );
   }
+  const mapNamesWinRates = Object.keys(ARENA_MAPS_BY_ID).map(mapId => {
+    const currentMapMatches = data.filter(row => row.zoneId === mapId);
+    const currentMapWinRate =
+      currentMapMatches.filter(row => row.won()).length /
+      currentMapMatches.length;
+    return [ARENA_MAPS_BY_ID[mapId], currentMapWinRate];
+  });
+  myBadges.push(
+    new MyBadge(
+      `Map win rates`,
+      '',
+      'primary',
+      mapNamesWinRates.map(it => `${it[0]}: ${(it[1] * 100).toFixed(1)}%`)
+    )
+  );
 
   return myBadges;
 };

@@ -15,9 +15,9 @@ export class Row {
   constructor(row) {
     this.isRanked = row[0];
     this.startTime = row[1] !== '' ? Number(row[1]) : undefined;
-    this.endTime =  row[2] !== '' ? Number(row[2]) : undefined;
+    this.endTime = row[2] !== '' ? Number(row[2]) : undefined;
     this.zoneId = row[3];
-    this.duration =  row[4] !== '' ? Number(row[4]) : undefined;
+    this.duration = row[4] !== '' ? Number(row[4]) : undefined;
     this.teamName = row[5];
     this.teamColor = row[6];
     this.winnerColor = row[7];
@@ -36,14 +36,14 @@ export class Row {
     this.teamPlayerRace3 = row[20];
     this.teamPlayerRace4 = row[21];
     this.teamPlayerRace5 = row[22];
-    this.oldTeamRating =  row[23] !== '' ? Number(row[23]) : undefined;
-    this.newTeamRating =  row[24] !== '' ? Number(row[24]) : undefined;
-    this.diffRating =  row[25] !== '' ? Number(row[25]) : undefined;
-    this.mmr =  row[26] !== '' ? Number(row[26]) : undefined;
-    this.enemyOldTeamRating =  row[27] !== '' ? Number(row[27]) : undefined;
-    this.enemyNewTeamRating =  row[28] !== '' ? Number(row[28]) : undefined;
-    this.enemyDiffRating =  row[29] !== '' ? Number(row[29]) : undefined;
-    this.enemyMmr =  row[30] !== '' ? Number(row[30]) : undefined;
+    this.oldTeamRating = row[23] !== '' ? Number(row[23]) : undefined;
+    this.newTeamRating = row[24] !== '' ? Number(row[24]) : undefined;
+    this.diffRating = row[25] !== '' ? Number(row[25]) : undefined;
+    this.mmr = row[26] !== '' ? Number(row[26]) : undefined;
+    this.enemyOldTeamRating = row[27] !== '' ? Number(row[27]) : undefined;
+    this.enemyNewTeamRating = row[28] !== '' ? Number(row[28]) : undefined;
+    this.enemyDiffRating = row[29] !== '' ? Number(row[29]) : undefined;
+    this.enemyMmr = row[30] !== '' ? Number(row[30]) : undefined;
     this.enemyTeamName = row[31];
     this.enemyPlayerName1 = row[32];
     this.enemyPlayerName2 = row[33];

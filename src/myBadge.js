@@ -1,11 +1,8 @@
 export class MyBadge {
-  constructor(title, details, appearance) {
+  constructor(title, details, appearance, detailsArray) {
     this.title = title;
     this.details = details;
     this.appearance = appearance;
-  }
-
-  toString() {
-    return '' + this.title + (this.details ? ' (' + this.details + ')' : '');
+    this.detailsArray = detailsArray;
   }
 }
