@@ -287,7 +287,7 @@ export default function App() {
     {
       dataField: 'aPercent',
       text: '% (A)',
-      headerFormatter: () => (
+      headerFormatter: (column, colIndex, components) => (
         <div>
           <img
             src={icons.alliance}
@@ -296,6 +296,7 @@ export default function App() {
             alt={'alliance'}
           />{' '}
           %
+          {components.sortElement}
         </div>
       ),
       sort: true,
@@ -320,9 +321,10 @@ export default function App() {
     {
       dataField: 'hPercent',
       text: '% (H)',
-      headerFormatter: () => (
+      headerFormatter: (column, colIndex, components) => (
         <div>
           <img src={icons.horde} width={'24'} height={'24'} alt={'horde'} /> %
+          {components.sortElement}
         </div>
       ),
       sort: true,
@@ -538,6 +540,7 @@ export default function App() {
               keyField="composition"
               data={content}
               columns={columns}
+              defaultSorted={[{dataField: 'total', order: 'desc'}]}
               bootstrap4={true}
               striped={true}
               bordered={true}
