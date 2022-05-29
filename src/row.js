@@ -109,6 +109,7 @@ export class Row {
     this.teamPlayerClass2 &&
     this.enemyPlayerClass1 &&
     this.enemyFaction &&
+    this.duration &&
     ((this.teamColor && this.winnerColor) || !isNaN(this.diffRating)) &&
     this.isValidSeason();
 

@@ -141,14 +141,16 @@ export const computeBadges = data => {
       currentMapMatches.length;
     return [ARENA_MAPS_BY_ID[mapId], currentMapWinRate];
   });
-  myBadges.push(
-    new MyBadge(
-      `Map win rates`,
-      '',
-      'primary',
-      mapNamesWinRates.map(it => `${it[0]}: ${(it[1] * 100).toFixed(1)}%`)
-    )
-  );
+  if (mapNamesWinRates.filter(it => !isNaN(it[1])).length !== 0) {
+    myBadges.push(
+      new MyBadge(
+        `Map win rates`,
+        '',
+        'primary',
+        mapNamesWinRates.filter(it => !isNaN(it[1])).map(it => `${it[0]}: ${(it[1] * 100).toFixed(1)}%`)
+      )
+    );
+  }
 
   return myBadges;
 };
