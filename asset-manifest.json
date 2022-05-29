@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/arena-stats-tbc-visualizer/static/css/main.e9f9e719.css",
-    "main.js": "/arena-stats-tbc-visualizer/static/js/main.23122288.js",
+    "main.js": "/arena-stats-tbc-visualizer/static/js/main.abc3787f.js",
     "static/js/787.9b8020d1.chunk.js": "/arena-stats-tbc-visualizer/static/js/787.9b8020d1.chunk.js",
     "static/media/alliance.png": "/arena-stats-tbc-visualizer/static/media/alliance.948620f625706393c5e3.png",
     "static/media/horde.png": "/arena-stats-tbc-visualizer/static/media/horde.bd8cecab9219c5312103.png",
@@ -18,11 +18,11 @@
     "static/media/warrior.webp": "/arena-stats-tbc-visualizer/static/media/warrior.ecec3981eff8f0fc47cf.webp",
     "index.html": "/arena-stats-tbc-visualizer/index.html",
     "main.e9f9e719.css.map": "/arena-stats-tbc-visualizer/static/css/main.e9f9e719.css.map",
-    "main.23122288.js.map": "/arena-stats-tbc-visualizer/static/js/main.23122288.js.map",
+    "main.abc3787f.js.map": "/arena-stats-tbc-visualizer/static/js/main.abc3787f.js.map",
     "787.9b8020d1.chunk.js.map": "/arena-stats-tbc-visualizer/static/js/787.9b8020d1.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e9f9e719.css",
-    "static/js/main.23122288.js"
+    "static/js/main.abc3787f.js"
   ]
 }
