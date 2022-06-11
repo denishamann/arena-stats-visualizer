@@ -1,7 +1,7 @@
 import { MyBadge } from './myBadge';
 import maxBy from 'lodash/maxBy';
 import minBy from 'lodash/minBy';
-import { ALL_CLASSES, ARENA_MAPS_BY_ID } from './constants';
+import { ALL_CLASSES, ARENA_MAP_IDS_BY_NAME } from './constants';
 import { longestSequence, mean, median, secondsToHms } from './util';
 
 export const computeBadges = data => {
@@ -134,12 +134,12 @@ export const computeBadges = data => {
       )
     );
   }
-  const mapNamesWinRates = Object.keys(ARENA_MAPS_BY_ID).map(mapId => {
-    const currentMapMatches = data.filter(row => row.zoneId === mapId);
+  const mapNamesWinRates = Object.keys(ARENA_MAP_IDS_BY_NAME).map(mapName => {
+    const currentMapMatches = data.filter(row => ARENA_MAP_IDS_BY_NAME[mapName].includes(row.zoneId));
     const currentMapWinRate =
       currentMapMatches.filter(row => row.won()).length /
       currentMapMatches.length;
-    return [ARENA_MAPS_BY_ID[mapId], currentMapWinRate];
+    return [mapName, currentMapWinRate];
   });
   if (mapNamesWinRates.filter(it => !isNaN(it[1])).length !== 0) {
     myBadges.push(
