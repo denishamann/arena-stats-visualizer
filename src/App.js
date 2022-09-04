@@ -101,7 +101,8 @@ export default function App() {
         (row.isSeasonOne() && seasons.includes('s1')) ||
         (row.isSeasonTwo() && seasons.includes('s2')) ||
         (row.isSeasonThree() && seasons.includes('s3')) ||
-        (row.isSeasonFour() && seasons.includes('s4'))
+        (row.isSeasonFour() && seasons.includes('s4')) ||
+        (row.isSeasonFiveOrLater() && seasons.includes('s5'))
     );
   };
 
@@ -385,6 +386,8 @@ export default function App() {
     switch (clazz) {
       case 'WARRIOR':
         return icons.warrior;
+      case 'DEATHKNIGHT':
+        return icons.deathknight;
       case 'PALADIN':
         return icons.paladin;
       case 'HUNTER':
@@ -525,6 +528,13 @@ export default function App() {
                 variant={'outline-primary'}
               >
                 Season 4
+              </ToggleButton>
+              <ToggleButton
+                id="season-5"
+                value={'s5'}
+                variant={'outline-primary'}
+              >
+                Season 5+
               </ToggleButton>
             </ToggleButtonGroup>
             <br />

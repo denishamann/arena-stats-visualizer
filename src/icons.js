@@ -3,6 +3,7 @@ import horde from './icons/horde.png';
 import github from './icons/github.png';
 import curse from './icons/curse.webp';
 import warrior from './icons/warrior.webp';
+import deathknight from './icons/deathknight.webp';
 import paladin from './icons/paladin.webp';
 import hunter from './icons/hunter.webp';
 import shaman from './icons/shaman.webp';
@@ -19,6 +20,7 @@ export {
   github,
   curse,
   warrior,
+  deathknight,
   paladin,
   hunter,
   shaman,

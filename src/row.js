@@ -1,5 +1,7 @@
 import {
   ALL_CLASSES,
+  SEASON_FIVE_START,
+  SEASON_FOUR_END,
   SEASON_FOUR_START,
   SEASON_ONE_END,
   SEASON_ONE_START,
@@ -179,7 +181,13 @@ export class Row {
   }
 
   isSeasonFour() {
-    return this.startTime > SEASON_FOUR_START;
+    return (
+      this.startTime > SEASON_FOUR_START && this.startTime < SEASON_FOUR_END
+    );
+  }
+
+  isSeasonFiveOrLater() {
+    return this.startTime > SEASON_FIVE_START;
   }
 
   isValidSeason() {
@@ -187,7 +195,8 @@ export class Row {
       this.isSeasonOne() ||
       this.isSeasonTwo() ||
       this.isSeasonThree() ||
-      this.isSeasonFour()
+      this.isSeasonFour() ||
+      this.isSeasonFiveOrLater()
     );
   }
 

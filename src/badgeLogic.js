@@ -135,7 +135,9 @@ export const computeBadges = data => {
     );
   }
   const mapNamesWinRates = Object.keys(ARENA_MAP_IDS_BY_NAME).map(mapName => {
-    const currentMapMatches = data.filter(row => ARENA_MAP_IDS_BY_NAME[mapName].includes(row.zoneId));
+    const currentMapMatches = data.filter(row =>
+      ARENA_MAP_IDS_BY_NAME[mapName].includes(row.zoneId)
+    );
     const currentMapWinRate =
       currentMapMatches.filter(row => row.won()).length /
       currentMapMatches.length;
@@ -147,7 +149,9 @@ export const computeBadges = data => {
         `Map win rates`,
         '',
         'primary',
-        mapNamesWinRates.filter(it => !isNaN(it[1])).map(it => `${it[0]}: ${(it[1] * 100).toFixed(1)}%`)
+        mapNamesWinRates
+          .filter(it => !isNaN(it[1]))
+          .map(it => `${it[0]}: ${(it[1] * 100).toFixed(1)}%`)
       )
     );
   }
