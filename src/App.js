@@ -426,7 +426,7 @@ export default function App() {
                 alt={'github'}
               />
               Contribute to the tool{' '}
-              <a href="https://github.com/denishamann/arena-stats-tbc-visualizer">
+              <a href="https://github.com/denishamann/arena-stats-visualizer">
                 on Github
               </a>
             </div>
@@ -438,9 +438,7 @@ export default function App() {
                 alt={'github'}
               />
               Contribute to the addon{' '}
-              <a href="https://github.com/denishamann/ArenaStatsTBC">
-                on Github
-              </a>
+              <a href="https://github.com/denishamann/ArenaStats">on Github</a>
             </div>
             <div>
               <img
@@ -451,7 +449,7 @@ export default function App() {
                 style={{ marginLeft: '5px', marginRight: '3px' }}
               />
               Get the addon{' '}
-              <a href="https://www.curseforge.com/wow/addons/arenastats-tbc">
+              <a href="https://www.curseforge.com/wow/addons/arenastats">
                 on CurseForge
               </a>
             </div>
@@ -462,11 +460,12 @@ export default function App() {
           <Container className="alerts-onboarding">
             <Alert key={'alert-infos'} variant={'primary'}>
               <Alert.Heading>Notice</Alert.Heading>
-              This is a visualizer for the Classic TBC addon "ArenaStats - TBC"
-              It allows you to import your data in order to analyze them by
-              bracket, by season, by enemy composition, and much more (to come!)
-              All you have to do is click on the "Export" button in-game, copy
-              the String, click on the "Import" button here, and paste it.
+              This is a visualizer for the Classic (TBC/WOTLK/etc) addon
+              "ArenaStats" It allows you to import your data in order to analyze
+              them by bracket, by season, by enemy composition, and much more
+              (to come!) All you have to do is click on the "Export" button
+              in-game, copy the String, click on the "Import" button here, and
+              paste it.
             </Alert>
             <Alert key={'alert-data'} variant={'warning'}>
               It automatically removes all skirmishes.

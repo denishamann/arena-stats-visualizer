@@ -1,8 +1,8 @@
 {
-  "name": "arena-stats-tbc-visualizer",
+  "name": "arena-stats-visualizer",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://denishamann.github.io/arena-stats-tbc-visualizer",
+  "homepage": "https://denishamann.github.io/arena-stats-visualizer",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.1.1",
