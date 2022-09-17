@@ -1,28 +1,29 @@
 {
   "files": {
-    "main.css": "/arena-stats-tbc-visualizer/static/css/main.e9f9e719.css",
-    "main.js": "/arena-stats-tbc-visualizer/static/js/main.05df9c66.js",
-    "static/js/787.9b8020d1.chunk.js": "/arena-stats-tbc-visualizer/static/js/787.9b8020d1.chunk.js",
-    "static/media/alliance.png": "/arena-stats-tbc-visualizer/static/media/alliance.948620f625706393c5e3.png",
-    "static/media/horde.png": "/arena-stats-tbc-visualizer/static/media/horde.bd8cecab9219c5312103.png",
-    "static/media/hunter.webp": "/arena-stats-tbc-visualizer/static/media/hunter.e4e7acdc1eda32ec4999.webp",
-    "static/media/unknown.webp": "/arena-stats-tbc-visualizer/static/media/unknown.0adf7ba9f42b0d6d1d26.webp",
-    "static/media/paladin.webp": "/arena-stats-tbc-visualizer/static/media/paladin.e280fd7509866c270c3b.webp",
-    "static/media/curse.webp": "/arena-stats-tbc-visualizer/static/media/curse.9aa5ebba9e1a6cd7559d.webp",
-    "static/media/warlock.webp": "/arena-stats-tbc-visualizer/static/media/warlock.0fbae0a33ebb98cea5c9.webp",
-    "static/media/shaman.webp": "/arena-stats-tbc-visualizer/static/media/shaman.5a280d23cc5a9d44b3a4.webp",
-    "static/media/mage.webp": "/arena-stats-tbc-visualizer/static/media/mage.1f0a14d8581eabc45965.webp",
-    "static/media/druid.webp": "/arena-stats-tbc-visualizer/static/media/druid.1c67fc94cfe659f02114.webp",
-    "static/media/rogue.webp": "/arena-stats-tbc-visualizer/static/media/rogue.fd889ca8daae7a01b755.webp",
-    "static/media/priest.webp": "/arena-stats-tbc-visualizer/static/media/priest.a0da6b10c1a09c6c780b.webp",
-    "static/media/warrior.webp": "/arena-stats-tbc-visualizer/static/media/warrior.ecec3981eff8f0fc47cf.webp",
-    "index.html": "/arena-stats-tbc-visualizer/index.html",
-    "main.e9f9e719.css.map": "/arena-stats-tbc-visualizer/static/css/main.e9f9e719.css.map",
-    "main.05df9c66.js.map": "/arena-stats-tbc-visualizer/static/js/main.05df9c66.js.map",
-    "787.9b8020d1.chunk.js.map": "/arena-stats-tbc-visualizer/static/js/787.9b8020d1.chunk.js.map"
+    "main.css": "/arena-stats-visualizer/static/css/main.e9f9e719.css",
+    "main.js": "/arena-stats-visualizer/static/js/main.b414fffc.js",
+    "static/js/787.bd082fa1.chunk.js": "/arena-stats-visualizer/static/js/787.bd082fa1.chunk.js",
+    "static/media/alliance.png": "/arena-stats-visualizer/static/media/alliance.948620f625706393c5e3.png",
+    "static/media/horde.png": "/arena-stats-visualizer/static/media/horde.bd8cecab9219c5312103.png",
+    "static/media/hunter.webp": "/arena-stats-visualizer/static/media/hunter.e4e7acdc1eda32ec4999.webp",
+    "static/media/unknown.webp": "/arena-stats-visualizer/static/media/unknown.0adf7ba9f42b0d6d1d26.webp",
+    "static/media/deathknight.webp": "/arena-stats-visualizer/static/media/deathknight.9740d8ac9a8a03018144.webp",
+    "static/media/paladin.webp": "/arena-stats-visualizer/static/media/paladin.e280fd7509866c270c3b.webp",
+    "static/media/curse.webp": "/arena-stats-visualizer/static/media/curse.9aa5ebba9e1a6cd7559d.webp",
+    "static/media/warlock.webp": "/arena-stats-visualizer/static/media/warlock.0fbae0a33ebb98cea5c9.webp",
+    "static/media/shaman.webp": "/arena-stats-visualizer/static/media/shaman.5a280d23cc5a9d44b3a4.webp",
+    "static/media/mage.webp": "/arena-stats-visualizer/static/media/mage.1f0a14d8581eabc45965.webp",
+    "static/media/druid.webp": "/arena-stats-visualizer/static/media/druid.1c67fc94cfe659f02114.webp",
+    "static/media/rogue.webp": "/arena-stats-visualizer/static/media/rogue.fd889ca8daae7a01b755.webp",
+    "static/media/priest.webp": "/arena-stats-visualizer/static/media/priest.a0da6b10c1a09c6c780b.webp",
+    "static/media/warrior.webp": "/arena-stats-visualizer/static/media/warrior.ecec3981eff8f0fc47cf.webp",
+    "index.html": "/arena-stats-visualizer/index.html",
+    "main.e9f9e719.css.map": "/arena-stats-visualizer/static/css/main.e9f9e719.css.map",
+    "main.b414fffc.js.map": "/arena-stats-visualizer/static/js/main.b414fffc.js.map",
+    "787.bd082fa1.chunk.js.map": "/arena-stats-visualizer/static/js/787.bd082fa1.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e9f9e719.css",
-    "static/js/main.05df9c66.js"
+    "static/js/main.b414fffc.js"
   ]
 }
