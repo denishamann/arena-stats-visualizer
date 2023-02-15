@@ -1,10 +1,12 @@
 import {
   ALL_CLASSES,
+  SEASON_FIVE_END,
   SEASON_FIVE_START,
   SEASON_FOUR_END,
   SEASON_FOUR_START,
   SEASON_ONE_END,
   SEASON_ONE_START,
+  SEASON_SIX_START,
   SEASON_THREE_END,
   SEASON_THREE_START,
   SEASON_TWO_END,
@@ -186,8 +188,12 @@ export class Row {
     );
   }
 
-  isSeasonFiveOrLater() {
-    return this.startTime > SEASON_FIVE_START;
+  isSeasonFive() {
+    return this.startTime > SEASON_FIVE_START && this.startTime < SEASON_FIVE_END;
+  }
+
+  isSeasonSixOrLater() {
+    return this.startTime > SEASON_SIX_START;
   }
 
   isValidSeason() {
@@ -196,7 +202,8 @@ export class Row {
       this.isSeasonTwo() ||
       this.isSeasonThree() ||
       this.isSeasonFour() ||
-      this.isSeasonFiveOrLater()
+      this.isSeasonFive() ||
+      this.isSeasonSixOrLater()
     );
   }
 
