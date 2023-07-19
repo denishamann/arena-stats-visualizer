@@ -214,6 +214,18 @@ export class Row {
     return `${outcome} as ${this.allies()} vs ${enemies}${mmr}`;
     // could also have shown isRanked/diffRating, day (endTime), zoneId...
   };
+  
+  allyClasses = () => {
+    const allies = [
+      this.teamPlayerClass1,
+      this.teamPlayerClass2,
+      this.teamPlayerClass3,
+      this.teamPlayerClass4,
+      this.teamPlayerClass5,
+      ];
+
+    return allies.filter(a => !!a);
+  };
 
   allies = () => {
     const allies = [
