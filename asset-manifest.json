@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/arena-stats-visualizer/static/css/main.e9f9e719.css",
-    "main.js": "/arena-stats-visualizer/static/js/main.48f2c149.js",
+    "main.js": "/arena-stats-visualizer/static/js/main.4f688601.js",
     "static/js/787.bd082fa1.chunk.js": "/arena-stats-visualizer/static/js/787.bd082fa1.chunk.js",
     "static/media/alliance.png": "/arena-stats-visualizer/static/media/alliance.948620f625706393c5e3.png",
     "static/media/horde.png": "/arena-stats-visualizer/static/media/horde.bd8cecab9219c5312103.png",
@@ -19,11 +19,11 @@
     "static/media/warrior.webp": "/arena-stats-visualizer/static/media/warrior.ecec3981eff8f0fc47cf.webp",
     "index.html": "/arena-stats-visualizer/index.html",
     "main.e9f9e719.css.map": "/arena-stats-visualizer/static/css/main.e9f9e719.css.map",
-    "main.48f2c149.js.map": "/arena-stats-visualizer/static/js/main.48f2c149.js.map",
+    "main.4f688601.js.map": "/arena-stats-visualizer/static/js/main.4f688601.js.map",
     "787.bd082fa1.chunk.js.map": "/arena-stats-visualizer/static/js/787.bd082fa1.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e9f9e719.css",
-    "static/js/main.48f2c149.js"
+    "static/js/main.4f688601.js"
   ]
 }
