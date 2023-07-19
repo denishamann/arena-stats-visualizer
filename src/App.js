@@ -34,6 +34,7 @@ export default function App() {
   const [corruptedCount, setCorruptedCount] = useState(0);
   const [seasons, setSeasons] = useState(DEFAULT_SEASONS);
   const [brackets, setBrackets] = useState(DEFAULT_BRACKETS);
+  const [playerClasses, setPlayerClasses] = useState(ALL_CLASSES);
 
   // Inferred state
   let totalMatches = 0;
@@ -74,11 +75,13 @@ export default function App() {
       const seasonSpecificData = getSeasonSpecificData(cleanData);
       const bracketAndSeasonSpecificData =
         getBracketSpecificData(seasonSpecificData);
+      const playerClassSpecificData =
+        getPlayerClassSpecificData(bracketAndSeasonSpecificData);
       const possibleCompositions = getAllPossibleCompositions(
-        bracketAndSeasonSpecificData
+        playerClassSpecificData
       );
       statsForEachComposition = getStatsForEachComposition(
-        bracketAndSeasonSpecificData,
+        playerClassSpecificData,
         possibleCompositions
       );
 
@@ -91,7 +94,7 @@ export default function App() {
         0
       );
 
-      badges = computeBadges(bracketAndSeasonSpecificData);
+      badges = computeBadges(playerClassSpecificData);
     }
   };
 
@@ -113,7 +116,12 @@ export default function App() {
         (row.is2sData() && brackets.includes('2s')) ||
         (row.is3sData() && brackets.includes('3s')) ||
         (row.is5sData() && brackets.includes('5s'))
-    );
+        );
+  };
+  
+  const getPlayerClassSpecificData = data => {
+    return data.filter(
+      row => row.allyClasses().every(v => playerClasses.includes(v)));
   };
 
   const getAllPossibleCompositions = data => {
@@ -572,6 +580,31 @@ export default function App() {
               >
                 5v5
               </ToggleButton>
+            </ToggleButtonGroup>
+            <br />
+            <strong>Team composition: </strong>
+            <ToggleButtonGroup
+              type="checkbox"
+              defaultValue={ALL_CLASSES}
+              onChange={setPlayerClasses}
+              className="as-toggle-button-groups"
+              >
+              {
+                ALL_CLASSES.map(cl => (
+                  <ToggleButton
+                    id={cl + '-toggle-button'}
+                    value={cl}
+                    variant={'outline-primary'}
+                    >
+                    <img
+                      src={classIcon(cl)}
+                      width={'32'}
+                      height={'32'}
+                      alt={cl}
+                    />
+                  </ToggleButton>
+                ))
+              }
             </ToggleButtonGroup>
             <br />{' '}
             <p>
