@@ -107,7 +107,9 @@ export default function App() {
         (row.isSeasonFour() && seasons.includes('s4')) ||
         (row.isSeasonFive() && seasons.includes('s5')) ||
         (row.isSeasonSix() && seasons.includes('s6')) ||
-        (row.isSeasonSevenOrLater() && seasons.includes('s7'))
+        (row.isSeasonSeven() && seasons.includes('s7')) ||
+        (row.isSeasonEight() && seasons.includes('s8')) ||
+        (row.isSeasonNineOrLater() && seasons.includes('s9'))
     );
   };
 
@@ -557,7 +559,21 @@ export default function App() {
                 value={'s7'}
                 variant={'outline-primary'}
               >
-                Season 7+
+                Season 7
+              </ToggleButton>
+              <ToggleButton
+                id="season-8"
+                value={'s8'}
+                variant={'outline-primary'}
+              >
+                Season 8
+              </ToggleButton>
+              <ToggleButton
+                id="season-9"
+                value={'s9'}
+                variant={'outline-primary'}
+              >
+                Season 9+
               </ToggleButton>
             </ToggleButtonGroup>
             <br />

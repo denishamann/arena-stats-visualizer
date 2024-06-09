@@ -11,6 +11,10 @@ export const SEASON_FIVE_END = 1673305199;  // Date and time (GMT): Monday 9 Jan
 export const SEASON_SIX_START = 1673910000; // Date and time (GMT): Tuesday 17 January 2023 00:00:00
 export const SEASON_SIX_END = 1685577599; // Date and time (GMT): Wednesday 31 May 2023 23:59:59 (actually ended on May 29/30th)
 export const SEASON_SEVEN_START = 1687046400; // Date and time (GMT): Sunday 18 June 2023 00:00:00 (actually started around June 20th)
+export const SEASON_SEVEN_END = 1696251599; // Date and time (GMT): Wednesday 31 May 2023 23:59:59
+export const SEASON_EIGHT_START = 1696928400; // Date and time (GMT): Sunday 18 June 2023 00:00:00
+export const SEASON_EIGHT_END = 1713218400; // Date and time (GMT): Wednesday 31 May 2023 23:59:59
+export const SEASON_NINE_START = 1716886800; // Date and time (GMT): Sunday 18 June 2023 00:00:00
 
 export const timestampsOk = () =>
   SEASON_ONE_START <
@@ -44,5 +48,5 @@ export const ARENA_MAP_IDS_BY_NAME = {
   'The Ring of Valor': ['4406', '618'],
 };
 
-export const DEFAULT_SEASONS = ['s1', 's2', 's3', 's4', 's5', 's6', 's7'];
+export const DEFAULT_SEASONS = ['s9'];
 export const DEFAULT_BRACKETS = ['2s'];

@@ -1,11 +1,15 @@
 import {
   ALL_CLASSES,
+  SEASON_EIGHT_END,
+  SEASON_EIGHT_START,
   SEASON_FIVE_END,
   SEASON_FIVE_START,
   SEASON_FOUR_END,
   SEASON_FOUR_START,
+  SEASON_NINE_START,
   SEASON_ONE_END,
   SEASON_ONE_START,
+  SEASON_SEVEN_END,
   SEASON_SEVEN_START,
   SEASON_SIX_END,
   SEASON_SIX_START,
@@ -198,8 +202,16 @@ export class Row {
     return this.startTime > SEASON_SIX_START && this.startTime < SEASON_SIX_END;
   }
 
-  isSeasonSevenOrLater() {
-    return this.startTime > SEASON_SEVEN_START
+  isSeasonSeven() {
+    return this.startTime > SEASON_SEVEN_START && this.startTime < SEASON_SEVEN_END;
+  }
+
+  isSeasonEight() {
+    return this.startTime > SEASON_EIGHT_START && this.startTime < SEASON_EIGHT_END;
+  }
+
+  isSeasonNineOrLater() {
+    return this.startTime > SEASON_NINE_START;
   }
 
   isValidSeason() {
@@ -210,7 +222,9 @@ export class Row {
       this.isSeasonFour() ||
       this.isSeasonFive() ||
       this.isSeasonSix() ||
-      this.isSeasonSevenOrLater()
+      this.isSeasonSeven() ||
+      this.isSeasonEight() ||
+      this.isSeasonNineOrLater()
     );
   }
 
@@ -221,7 +235,7 @@ export class Row {
     return `${outcome} as ${this.allies()} vs ${enemies}${mmr}`;
     // could also have shown isRanked/diffRating, day (endTime), zoneId...
   };
-  
+
   allyClasses = () => {
     const allies = [
       this.teamPlayerClass1,
@@ -229,7 +243,7 @@ export class Row {
       this.teamPlayerClass3,
       this.teamPlayerClass4,
       this.teamPlayerClass5,
-      ];
+    ];
 
     return allies.filter(a => !!a);
   };
