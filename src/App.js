@@ -13,6 +13,8 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
+  Dropdown,
+  Accordion,
 } from 'react-bootstrap';
 import { computeBadges } from './badgeLogic';
 import {
@@ -25,6 +27,9 @@ import { Row } from './row';
 import BootstrapTable from 'react-bootstrap-table-next';
 import * as icons from './icons';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+import AccordionItem from 'react-bootstrap/esm/AccordionItem';
+import AccordionHeader from 'react-bootstrap/esm/AccordionHeader';
+import AccordionBody from 'react-bootstrap/esm/AccordionBody';
 
 export default function App() {
   // React state
@@ -35,6 +40,7 @@ export default function App() {
   const [seasons, setSeasons] = useState(DEFAULT_SEASONS);
   const [brackets, setBrackets] = useState(DEFAULT_BRACKETS);
   const [playerClasses, setPlayerClasses] = useState(ALL_CLASSES);
+  const [showSpecs, setShowSpecs] = useState(true);
 
   // Inferred state
   let totalMatches = 0;
@@ -75,8 +81,9 @@ export default function App() {
       const seasonSpecificData = getSeasonSpecificData(cleanData);
       const bracketAndSeasonSpecificData =
         getBracketSpecificData(seasonSpecificData);
-      const playerClassSpecificData =
-        getPlayerClassSpecificData(bracketAndSeasonSpecificData);
+      const playerClassSpecificData = getPlayerClassSpecificData(
+        bracketAndSeasonSpecificData
+      );
       const possibleCompositions = getAllPossibleCompositions(
         playerClassSpecificData
       );
@@ -119,18 +126,19 @@ export default function App() {
         (row.is2sData() && brackets.includes('2s')) ||
         (row.is3sData() && brackets.includes('3s')) ||
         (row.is5sData() && brackets.includes('5s'))
-        );
+    );
   };
-  
+
   const getPlayerClassSpecificData = data => {
-    return data.filter(
-      row => row.allyClasses().every(v => playerClasses.includes(v)));
+    return data.filter(row =>
+      row.allyClasses().every(v => playerClasses.includes(v))
+    );
   };
 
   const getAllPossibleCompositions = data => {
     const compositions = new Set();
     data.forEach(row => {
-      const comp = row.getComposition(brackets);
+      const comp = row.getComposition(brackets, showSpecs);
       if (comp !== '') {
         compositions.add(comp);
       }
@@ -152,7 +160,7 @@ export default function App() {
     });
 
     data.forEach(row => {
-      const comp = row.getComposition(brackets);
+      const comp = row.getComposition(brackets, showSpecs);
       if (comp !== '') {
         const index = stats.findIndex(s => s.comp === comp);
         if (index !== -1) {
@@ -395,27 +403,150 @@ export default function App() {
   });
 
   const classIcon = clazz => {
-    switch (clazz) {
+    const [classPart, specPart] = clazz.split('%');
+
+    switch (classPart) {
       case 'WARRIOR':
-        return icons.warrior;
+        if (clazz.includes('%')) {
+          console.log('THIS IS WARRRION THAT IS ' + specPart);
+          if (specPart === 'Fury') {
+            return icons.fury;
+          } else if (specPart === 'Arms') {
+            return icons.arms;
+          } else if (specPart === 'Protection') {
+            return icons.protection;
+          } else {
+            return icons.warrior;
+          }
+        } else {
+          return icons.warrior;
+        }
       case 'DEATHKNIGHT':
-        return icons.deathknight;
+        if (clazz.includes('%')) {
+          if (specPart === 'Frost') {
+            return icons.frost;
+          } else if (specPart === 'Unholy') {
+            return icons.unholy;
+          } else if (specPart === 'Blood') {
+            return icons.blood;
+          } else {
+            return icons.deathknight;
+          }
+        } else {
+          return icons.deathknight;
+        }
       case 'PALADIN':
-        return icons.paladin;
+        if (clazz.includes('%')) {
+          if (specPart === 'Holy') {
+            return icons.holy;
+          } else if (specPart === 'Protection') {
+            return icons.protection;
+          } else if (specPart === 'Retribution') {
+            return icons.retribution;
+          } else {
+            return icons.paladin;
+          }
+        } else {
+          return icons.paladin;
+        }
       case 'HUNTER':
-        return icons.hunter;
+        if (clazz.includes('%')) {
+          if (specPart === 'Beastmastery') {
+            return icons.beastmastery;
+          } else if (specPart === 'Marksmanship') {
+            return icons.marksmanship;
+          } else if (specPart === 'Survival') {
+            return icons.survival;
+          } else {
+            return icons.hunter;
+          }
+        } else {
+          return icons.hunter;
+        }
       case 'SHAMAN':
-        return icons.shaman;
+        if (clazz.includes('%')) {
+          if (specPart === 'Elemental') {
+            return icons.elemental;
+          } else if (specPart === 'Enhancement') {
+            return icons.enhancement;
+          } else if (specPart === 'Restoration') {
+            return icons.restoration;
+          } else {
+            return icons.shaman;
+          }
+        } else {
+          return icons.shaman;
+        }
       case 'ROGUE':
-        return icons.rogue;
+        if (clazz.includes('%')) {
+          if (specPart === 'Assassination') {
+            return icons.assassination;
+          } else if (specPart === 'Combat') {
+            return icons.combat;
+          } else if (specPart === 'Subtlety') {
+            return icons.subtlety;
+          } else {
+            return icons.rogue;
+          }
+        } else {
+          return icons.rogue;
+        }
       case 'DRUID':
-        return icons.druid;
+        if (clazz.includes('%')) {
+          if (specPart === 'Balance') {
+            return icons.balance;
+          } else if (specPart === 'Feral') {
+            return icons.feral;
+          } else if (specPart === 'Restoration') {
+            return icons.restoration;
+          } else {
+            return icons.druid;
+          }
+        } else {
+          return icons.druid;
+        }
       case 'PRIEST':
-        return icons.priest;
+        if (clazz.includes('%')) {
+          if (specPart === 'Discipline') {
+            return icons.discipline;
+          } else if (specPart === 'Holy') {
+            return icons.holy;
+          } else if (specPart === 'Shadow') {
+            return icons.shadow;
+          } else {
+            return icons.priest;
+          }
+        } else {
+          return icons.priest;
+        }
       case 'MAGE':
-        return icons.mage;
+        if (clazz.includes('%')) {
+          if (specPart === 'Arcane') {
+            return icons.arcane;
+          } else if (specPart === 'Fire') {
+            return icons.fire;
+          } else if (specPart === 'Frost') {
+            return icons.frost;
+          } else {
+            return icons.mage;
+          }
+        } else {
+          return icons.mage;
+        }
       case 'WARLOCK':
-        return icons.warlock;
+        if (clazz.includes('%')) {
+          if (specPart === 'Affliction') {
+            return icons.affliction;
+          } else if (specPart === 'Demonology') {
+            return icons.demonology;
+          } else if (specPart === 'Destruction') {
+            return icons.destruction;
+          } else {
+            return icons.warlock;
+          }
+        } else {
+          return icons.warlock;
+        }
       default:
         return icons.unknown;
     }
@@ -493,201 +624,230 @@ export default function App() {
             </Alert>
           </Container>
         ) : (
-          <Container>
-            <br />
-            <strong>Total matches: {totalMatches}</strong>
-            <br />
-            <strong className="total-wins">Total wins: {totalWins}</strong>
-            <br />
-            {!!totalMatches && (
-              <strong>
-                Total win rate: {((totalWins / totalMatches) * 100).toFixed(2)}%
-              </strong>
-            )}
-            <br />
-            <br />
-            <ToggleButtonGroup
-              type="checkbox"
-              defaultValue={DEFAULT_SEASONS}
-              onChange={setSeasons}
-              className="as-toggle-button-groups"
-            >
-              <ToggleButton
-                id="season-1"
-                value={'s1'}
-                variant={'outline-primary'}
-              >
-                Season 1
-              </ToggleButton>
-              <ToggleButton
-                id="season-2"
-                value={'s2'}
-                variant={'outline-primary'}
-              >
-                Season 2
-              </ToggleButton>
-              <ToggleButton
-                id="season-3"
-                value={'s3'}
-                variant={'outline-primary'}
-              >
-                Season 3
-              </ToggleButton>
-              <ToggleButton
-                id="season-4"
-                value={'s4'}
-                variant={'outline-primary'}
-              >
-                Season 4
-              </ToggleButton>
-              <ToggleButton
-                id="season-5"
-                value={'s5'}
-                variant={'outline-primary'}
-              >
-                Season 5
-              </ToggleButton>
-              <ToggleButton
-                id="season-6"
-                value={'s6'}
-                variant={'outline-primary'}
-              >
-                Season 6
-              </ToggleButton>
-              <ToggleButton
-                id="season-7"
-                value={'s7'}
-                variant={'outline-primary'}
-              >
-                Season 7
-              </ToggleButton>
-              <ToggleButton
-                id="season-8"
-                value={'s8'}
-                variant={'outline-primary'}
-              >
-                Season 8
-              </ToggleButton>
-              <ToggleButton
-                id="season-9"
-                value={'s9'}
-                variant={'outline-primary'}
-              >
-                Season 9+
-              </ToggleButton>
-            </ToggleButtonGroup>
-            <br />
-            <ToggleButtonGroup
-              type="checkbox"
-              defaultValue={DEFAULT_BRACKETS}
-              onChange={setBrackets}
-              className="as-toggle-button-groups"
-            >
-              <ToggleButton
-                id="bracket-2s"
-                value={'2s'}
-                variant={'outline-primary'}
-              >
-                2v2
-              </ToggleButton>
-              <ToggleButton
-                id="bracket-3s"
-                value={'3s'}
-                variant={'outline-primary'}
-              >
-                3v3
-              </ToggleButton>
-              <ToggleButton
-                id="bracket-5s"
-                value={'5s'}
-                variant={'outline-primary'}
-              >
-                5v5
-              </ToggleButton>
-            </ToggleButtonGroup>
-            <br />
-            <strong>Team composition: </strong>
-            <ToggleButtonGroup
-              type="checkbox"
-              defaultValue={ALL_CLASSES}
-              onChange={setPlayerClasses}
-              className="as-toggle-button-groups"
-              >
-              {
-                ALL_CLASSES.map(cl => (
-                  <ToggleButton
-                    id={cl + '-toggle-button'}
-                    value={cl}
-                    variant={'outline-primary'}
-                    >
-                    <img
-                      src={classIcon(cl)}
-                      width={'32'}
-                      height={'32'}
-                      alt={cl}
+          <Container fluid>
+            <div className="main-content">
+              <div className="settings">
+                <div>
+                  <Form>
+                    <Form.Check
+                      type="checkbox"
+                      id={'checkbox_specs'}
+                      label={`Show Specs`}
+                      checked={showSpecs}
+                      onChange={() => setShowSpecs(!showSpecs)}
                     />
-                  </ToggleButton>
-                ))
-              }
-            </ToggleButtonGroup>
-            <br />{' '}
-            <p>
-              <span className="blue">Blue = vs Alliance</span>{' '}
-              <span className="red">Red = vs Horde</span>
-            </p>
-            <BootstrapTable
-              keyField="composition"
-              data={content}
-              columns={columns}
-              defaultSorted={[{ dataField: 'total', order: 'desc' }]}
-              bootstrap4={true}
-              striped={true}
-              bordered={true}
-              hover={true}
-              classes={'data-table'}
-            />
-            <Container>
-              <BootstrapRow
-                xs={1}
-                sm={2}
-                md={2}
-                lg={3}
-                xl={4}
-                xxl={4}
-                className="g-4"
-              >
-                {badges.map(badge => (
-                  <Col key={badge.title}>
-                    <Card
-                      key={badge.title}
-                      border={badge.appearance}
-                      style={{ height: '100%' }}
+                  </Form>
+                </div>
+                <div>
+                  <h2>Brackets</h2>
+                  <ToggleButtonGroup
+                    type="checkbox"
+                    defaultValue={DEFAULT_BRACKETS}
+                    onChange={setBrackets}
+                  >
+                    <ToggleButton
+                      id="bracket-2s"
+                      value={'2s'}
+                      variant={'outline-primary'}
                     >
-                      <Card.Header as="h5">{badge.title}</Card.Header>
-                      <Card.Body>
-                        <Card.Text className="mb-2 text-muted">
-                          {badge.details ? (
-                            badge.details
-                          ) : (
-                            <ul className="sober">
-                              {badge.detailsArray.map(it => (
-                                <li>{it}</li>
-                              ))}
-                            </ul>
-                          )}
-                        </Card.Text>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                ))}
-              </BootstrapRow>
-            </Container>
-            <br />
-            <p>
-              Skipped <strong className="red">{corruptedCount}</strong>{' '}
-              unprocessable records (all seasons/brackets considered). Open
-              console to inspect them if needed.
-            </p>
+                      2v2
+                    </ToggleButton>
+                    <ToggleButton
+                      id="bracket-3s"
+                      value={'3s'}
+                      variant={'outline-primary'}
+                    >
+                      3v3
+                    </ToggleButton>
+                    <ToggleButton
+                      id="bracket-5s"
+                      value={'5s'}
+                      variant={'outline-primary'}
+                    >
+                      5v5
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </div>
+                <div className="seasons">
+                  <Accordion defaultActiveKey={0}>
+                    <AccordionItem eventKey="0">
+                      <AccordionHeader>Seasons</AccordionHeader>
+                      <AccordionBody>
+                        <ToggleButtonGroup
+                          type="checkbox"
+                          defaultValue={DEFAULT_SEASONS}
+                          vertical={true}
+                          size="lg"
+                          onChange={setSeasons}
+                        >
+                          <ToggleButton
+                            id="season-1"
+                            value={'s1'}
+                            variant={'outline-primary'}
+                          >
+                            Season 1
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-2"
+                            value={'s2'}
+                            variant={'outline-primary'}
+                          >
+                            Season 2
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-3"
+                            value={'s3'}
+                            variant={'outline-primary'}
+                          >
+                            Season 3
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-4"
+                            value={'s4'}
+                            variant={'outline-primary'}
+                          >
+                            Season 4
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-5"
+                            value={'s5'}
+                            variant={'outline-primary'}
+                          >
+                            Season 5
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-6"
+                            value={'s6'}
+                            variant={'outline-primary'}
+                          >
+                            Season 6
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-7"
+                            value={'s7'}
+                            variant={'outline-primary'}
+                          >
+                            Season 7
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-8"
+                            value={'s8'}
+                            variant={'outline-primary'}
+                          >
+                            Season 8
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-9"
+                            value={'s9'}
+                            variant={'outline-primary'}
+                          >
+                            Season 9+
+                          </ToggleButton>
+                        </ToggleButtonGroup>
+                      </AccordionBody>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              </div>
+              <div>
+                <br />
+                <strong>Total matches: {totalMatches}</strong>
+                <br />
+                <strong className="total-wins">Total wins: {totalWins}</strong>
+                <br />
+                {!!totalMatches && (
+                  <strong>
+                    Total win rate:{' '}
+                    {((totalWins / totalMatches) * 100).toFixed(2)}%
+                  </strong>
+                )}
+                <br />
+                <br />
+                <br />
+                <br />
+                <strong>Team composition: </strong>
+                <ToggleButtonGroup
+                  type="checkbox"
+                  defaultValue={ALL_CLASSES}
+                  onChange={setPlayerClasses}
+                  className="as-toggle-button-groups"
+                >
+                  {ALL_CLASSES.map(cl => (
+                    <ToggleButton
+                      id={cl + '-toggle-button'}
+                      value={cl}
+                      variant={'outline-primary'}
+                    >
+                      <img
+                        src={classIcon(cl)}
+                        width={'32'}
+                        height={'32'}
+                        alt={cl}
+                      />
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+                <br />{' '}
+                <p>
+                  <span className="blue">Blue = vs Alliance</span>{' '}
+                  <span className="red">Red = vs Horde</span>
+                </p>
+                <BootstrapTable
+                  keyField="composition"
+                  data={content}
+                  columns={columns}
+                  defaultSorted={[{ dataField: 'total', order: 'desc' }]}
+                  bootstrap4={true}
+                  striped={true}
+                  bordered={true}
+                  hover={true}
+                  classes={'data-table'}
+                />
+                <Container>
+                  <BootstrapRow
+                    xs={1}
+                    sm={2}
+                    md={2}
+                    lg={3}
+                    xl={4}
+                    xxl={4}
+                    className="g-4"
+                  >
+                    {badges.map(badge => (
+                      <Col key={badge.title}>
+                        <Card
+                          key={badge.title}
+                          border={badge.appearance}
+                          style={{ height: '100%' }}
+                        >
+                          <Card.Header as="h5">{badge.title}</Card.Header>
+                          <Card.Body>
+                            <Card.Text className="mb-2 text-muted">
+                              {badge.details ? (
+                                badge.details
+                              ) : (
+                                <ul className="sober">
+                                  {badge.detailsArray.map(it => (
+                                    <li>{it}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </Card.Text>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    ))}
+                  </BootstrapRow>
+                </Container>
+                <br />
+                <p>
+                  Skipped <strong className="red">{corruptedCount}</strong>{' '}
+                  unprocessable records (all seasons/brackets considered). Open
+                  console to inspect them if needed.
+                </p>
+              </div>
+              <div>DDDDASDASDASDASD</div>
+            </div>
           </Container>
         )}
 
@@ -765,6 +925,7 @@ export default function App() {
         .as-toggle-button-groups > label {
           margin: 0 10px 0 0;
           border-radius: 0.25rem !important;
+          overflow: hidden;
         }
         .as-toggle-button-groups > label:hover {
           background-color: lightsteelblue;

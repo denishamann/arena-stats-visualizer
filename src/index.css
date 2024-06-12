@@ -11,3 +11,42 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: stretch;
+  width: 100%;
+}
+
+.settings {
+  border-right: 1px solid #999999;
+  padding-right: 60px;
+  margin-right: 6px;
+  max-width: 200px;
+}
+
+.seasons {
+  margin-top: 20px;
+}
+
+.main-content:nth-child(1) {
+  flex-grow: 0;
+  flex-shrink: 1;
+  order: 0;
+}
+
+.main-content:nth-child(2) {
+  flex-grow: 1;
+  flex-shrink: 1;
+  order: 0;
+}
+
+.main-content:nth-child(3) {
+  flex-grow: 0;
+  flex-shrink: 1;
+  order: 0;
+}
