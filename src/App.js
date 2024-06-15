@@ -13,13 +13,11 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
-  Dropdown,
   Accordion,
 } from 'react-bootstrap';
 import { computeBadges } from './badgeLogic';
 import {
   ALL_CLASSES,
-  ALL_SPECS,
   DEFAULT_BRACKETS,
   DEFAULT_SEASONS,
   timestampsOk,
@@ -112,26 +110,6 @@ export default function App() {
     }
   };
 
-  const playedCompositions = (data, showSpecs) => {
-    const compositions = [];
-    data.forEach(row => {
-      const comp = row.teamComp();
-      const key = comp
-        .map(x => x.playerClass + (showSpecs ? '%' + x.spec : ''))
-        .join('+');
-
-      const index = compositions.findIndex(c => c.key === key);
-
-      if (index === -1) {
-        compositions.push({ key: key, value: 1 });
-      } else {
-        compositions[index].value++;
-      }
-    });
-
-    return compositions;
-  };
-
   const getSeasonSpecificData = data => {
     return data.filter(
       row =>
@@ -195,7 +173,7 @@ export default function App() {
 
         let index = stats.findIndex(s => s.clazz === clazz && s.spec === spec);
 
-        if (index != -1) {
+        if (index !== -1) {
           stats[index].total = stats[index].total + 1;
           if (row.won()) {
             stats[index].wins = stats[index].wins + 1;
