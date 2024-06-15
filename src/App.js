@@ -19,6 +19,7 @@ import {
 import { computeBadges } from './badgeLogic';
 import {
   ALL_CLASSES,
+  ALL_SPECS,
   DEFAULT_BRACKETS,
   DEFAULT_SEASONS,
   timestampsOk,
@@ -47,6 +48,7 @@ export default function App() {
   let totalWins = 0;
   let statsForEachComposition = [];
   let badges = [];
+  let winrates = [];
 
   if (!timestampsOk())
     console.log('Error in arena season start/end timestamps!');
@@ -92,6 +94,11 @@ export default function App() {
         possibleCompositions
       );
 
+      winrates = getStatsAgainstClassesAndSpecs(
+        playerClassSpecificData,
+        showSpecs
+      );
+
       totalMatches = statsForEachComposition.reduce(
         (prev, curr) => prev + curr.total,
         0
@@ -103,6 +110,26 @@ export default function App() {
 
       badges = computeBadges(playerClassSpecificData);
     }
+  };
+
+  const playedCompositions = (data, showSpecs) => {
+    const compositions = [];
+    data.forEach(row => {
+      const comp = row.teamComp();
+      const key = comp
+        .map(x => x.playerClass + (showSpecs ? '%' + x.spec : ''))
+        .join('+');
+
+      const index = compositions.findIndex(c => c.key === key);
+
+      if (index === -1) {
+        compositions.push({ key: key, value: 1 });
+      } else {
+        compositions[index].value++;
+      }
+    });
+
+    return compositions;
   };
 
   const getSeasonSpecificData = data => {
@@ -144,6 +171,47 @@ export default function App() {
       }
     });
     return Array.from(compositions).sort((a, b) => a.localeCompare(b)); // this .sort is useless; it will be re-sorted by wins anyway
+  };
+
+  const getStatsAgainstClassesAndSpecs = (data, showSpecs) => {
+    const stats = [];
+
+    for (const row of data) {
+      const comp = row.getComposition(brackets, showSpecs);
+
+      for (const player of comp.split('+')) {
+        let clazz = '';
+        let spec = '';
+
+        if (showSpecs) {
+          [clazz, spec] = player.split('%');
+        } else {
+          clazz = player;
+        }
+
+        if (clazz === '') {
+          continue;
+        }
+
+        let index = stats.findIndex(s => s.clazz === clazz && s.spec === spec);
+
+        if (index != -1) {
+          stats[index].total = stats[index].total + 1;
+          if (row.won()) {
+            stats[index].wins = stats[index].wins + 1;
+          }
+        } else {
+          stats.push({
+            clazz: clazz,
+            spec: spec,
+            total: 1,
+            wins: row.won() ? 1 : 0,
+          });
+        }
+      }
+    }
+
+    return stats.sort((a, b) => b.wins / b.total > a.wins / a.total);
   };
 
   const getStatsForEachComposition = (data, possibleCompositions) => {
@@ -408,7 +476,6 @@ export default function App() {
     switch (classPart) {
       case 'WARRIOR':
         if (clazz.includes('%')) {
-          console.log('THIS IS WARRRION THAT IS ' + specPart);
           if (specPart === 'Fury') {
             return icons.fury;
           } else if (specPart === 'Arms') {
@@ -498,7 +565,7 @@ export default function App() {
           } else if (specPart === 'Feral') {
             return icons.feral;
           } else if (specPart === 'Restoration') {
-            return icons.restoration;
+            return icons.restorationDruid;
           } else {
             return icons.druid;
           }
@@ -526,7 +593,7 @@ export default function App() {
           } else if (specPart === 'Fire') {
             return icons.fire;
           } else if (specPart === 'Frost') {
-            return icons.frost;
+            return icons.frostMage;
           } else {
             return icons.mage;
           }
@@ -750,48 +817,42 @@ export default function App() {
                 </div>
               </div>
               <div>
-                <br />
-                <strong>Total matches: {totalMatches}</strong>
-                <br />
-                <strong className="total-wins">Total wins: {totalWins}</strong>
-                <br />
-                {!!totalMatches && (
-                  <strong>
-                    Total win rate:{' '}
-                    {((totalWins / totalMatches) * 100).toFixed(2)}%
-                  </strong>
-                )}
-                <br />
-                <br />
-                <br />
-                <br />
-                <strong>Team composition: </strong>
-                <ToggleButtonGroup
-                  type="checkbox"
-                  defaultValue={ALL_CLASSES}
-                  onChange={setPlayerClasses}
-                  className="as-toggle-button-groups"
-                >
-                  {ALL_CLASSES.map(cl => (
-                    <ToggleButton
-                      id={cl + '-toggle-button'}
-                      value={cl}
-                      variant={'outline-primary'}
-                    >
-                      <img
-                        src={classIcon(cl)}
-                        width={'32'}
-                        height={'32'}
-                        alt={cl}
-                      />
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
-                <br />{' '}
-                <p>
-                  <span className="blue">Blue = vs Alliance</span>{' '}
-                  <span className="red">Red = vs Horde</span>
-                </p>
+                <div className="header-stats">
+                  <strong>Total matches: {totalMatches}</strong>
+                  <strong>Total wins: {totalWins}</strong>
+                  {!!totalMatches && (
+                    <strong>
+                      Total win rate:{' '}
+                      {((totalWins / totalMatches) * 100).toFixed(2)}%
+                    </strong>
+                  )}
+                  <strong>Team composition: </strong>
+                  <ToggleButtonGroup
+                    type="checkbox"
+                    defaultValue={ALL_CLASSES}
+                    onChange={setPlayerClasses}
+                    className="as-toggle-button-groups"
+                  >
+                    {ALL_CLASSES.map(cl => (
+                      <ToggleButton
+                        id={cl + '-toggle-button'}
+                        value={cl}
+                        variant={'outline-primary'}
+                      >
+                        <img
+                          src={classIcon(cl)}
+                          width={'32'}
+                          height={'32'}
+                          alt={cl}
+                        />
+                      </ToggleButton>
+                    ))}
+                  </ToggleButtonGroup>
+                  <p>
+                    <span className="blue">Blue = vs Alliance</span>{' '}
+                    <span className="red">Red = vs Horde</span>
+                  </p>
+                </div>
                 <BootstrapTable
                   keyField="composition"
                   data={content}
@@ -846,7 +907,51 @@ export default function App() {
                   console to inspect them if needed.
                 </p>
               </div>
-              <div>DDDDASDASDASDASD</div>
+              <div className="random-stats">
+                <div>
+                  <h2>Win %</h2>
+                  <div className="winrates-class">
+                    {winrates.map(x => {
+                      return (
+                        <div className="winrate-item">
+                          <img
+                            key={x.clazz + '%' + x.spec}
+                            src={classIcon(x.clazz + '%' + x.spec)}
+                            width={'32'}
+                            height={'32'}
+                            alt={x.clazz}
+                          />
+                          <span className="winrate-text">
+                            {parseFloat((x.wins / x.total) * 100).toFixed(1) +
+                              '%'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <h2>Games vs.</h2>
+                  <div className="winrates-class">
+                    {winrates
+                      .sort((a, b) => a.total < b.total)
+                      .map(x => {
+                        return (
+                          <div className="winrate-item">
+                            <img
+                              key={x.clazz + '%' + x.spec}
+                              src={classIcon(x.clazz + '%' + x.spec)}
+                              width={'32'}
+                              height={'32'}
+                              alt={x.clazz}
+                            />
+                            <span className="winrate-text">{x.total}</span>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              </div>
             </div>
           </Container>
         )}
@@ -898,10 +1003,6 @@ export default function App() {
           text-transform: uppercase;
           border: none;
           margin-top: 10px;
-        }
-
-        .total-wins {
-          margin-bottom: 10px;
         }
         .data-table {
           margin-top: 10px;

@@ -29,8 +29,42 @@ code {
   max-width: 200px;
 }
 
+.header-stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.total-wins {
+  
+}
+
 .seasons {
   margin-top: 20px;
+}
+
+.random-stats {
+  margin-left: 20px;
+  margin-right: 20px;
+  min-width: 200px;
+}
+
+.winrates-class {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.winrate-item {
+  flex: 1 1 50%;
+  width: 0;
+  margin-bottom: 5px;
+}
+
+.winrate-text {
+  margin-left: 5px;
+  font-weight: 600;
 }
 
 .main-content:nth-child(1) {

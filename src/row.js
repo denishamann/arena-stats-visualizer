@@ -273,6 +273,18 @@ export class Row {
     return allies.filter(a => !!a);
   };
 
+  teamComp = () => {
+    const allies = [
+      new ClassAndSpec(this.teamPlayerClass1, this.teamSpec1),
+      new ClassAndSpec(this.teamPlayerClass2, this.teamSpec2),
+      new ClassAndSpec(this.teamPlayerClass3, this.teamSpec3),
+      new ClassAndSpec(this.teamPlayerClass4, this.teamSpec4),
+      new ClassAndSpec(this.teamPlayerClass5, this.teamSpec5),
+    ];
+
+    return allies.filter(a => !!a.playerClass);
+  };
+
   allies = () => {
     const allies = [
       new ClassAndSpec(this.teamPlayerName1, this.teamSpec1),
@@ -282,7 +294,10 @@ export class Row {
       new ClassAndSpec(this.teamPlayerName5, this.teamSpec5),
     ];
 
-    return allies.filter(a => !!a.playerClass).join('/');
+    return allies
+      .filter(a => !!a.playerClass)
+      .map(a => a.playerClass)
+      .join('/');
   };
 
   enemies = () => {

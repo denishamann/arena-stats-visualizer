@@ -40,6 +40,19 @@ export const ALL_CLASSES = [
   'PRIEST',
 ];
 
+export const ALL_SPECS = {
+  WARRIOR: ['Arms', 'Fury', 'Protection'],
+  DEATHKNIGHT: ['Blood', 'Frost', 'Unholy'],
+  HUNTER: ['Beast Mastery', 'Marksmanship', 'Survival'],
+  ROGUE: ['Assassination', 'Combat', 'Subtlety'],
+  MAGE: ['Arcane', 'Fire', 'Frost'],
+  WARLOCK: ['Affliction', 'Demonology', 'Destruction'],
+  PALADIN: ['Holy', 'Protection', 'Retribution'],
+  SHAMAN: ['Elemental', 'Enhancement', 'Restoration'],
+  DRUID: ['Balance', 'Feral', 'Restoration'],
+  PRIEST: ['Discipline', 'Holy', 'Shadow'],
+};
+
 export const ARENA_MAP_IDS_BY_NAME = {
   'Nagrand Arena': ['3698', '559'],
   "Blade's Edge Arena": ['3702', '562'],
