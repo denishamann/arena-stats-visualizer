@@ -113,9 +113,8 @@ export class Row {
         this.enemyPlayerClass2 + (showSpecs ? '%' + this.enemySpec2 : '')
       );
     }
-    return enemyPlayerClasses
-      .sort((a, b) => ALL_CLASSES.indexOf(a) - ALL_CLASSES.indexOf(b))
-      .join('+');
+
+    return enemyPlayerClasses.sort((a, b) => a < b).join('+');
   };
 
   won = () =>

@@ -235,6 +235,22 @@ export default function App() {
 
   processState();
 
+  const sortValue = cell => {
+    if (!cell.includes('%')) {
+      return 1;
+    }
+
+    if (cell.includes('Restoration')) {
+      return -100;
+    } else if (cell.includes('Holy')) {
+      return -90;
+    } else if (cell.includes('Discipline')) {
+      return -80;
+    }
+
+    return cell.split('%')[0].length;
+  };
+
   const columns = [
     {
       dataField: 'composition',
@@ -244,15 +260,17 @@ export default function App() {
         const classes = cell.split('+');
         return (
           <div key={cell}>
-            {classes.map((clazz, idx) => (
-              <img
-                key={idx + clazz}
-                src={classIcon(clazz)}
-                width={'32'}
-                height={'32'}
-                alt={clazz}
-              />
-            ))}
+            {classes
+              .sort((a, b) => sortValue(a) < sortValue(b))
+              .map((clazz, idx) => (
+                <img
+                  key={idx + clazz}
+                  src={classIcon(clazz)}
+                  width={'32'}
+                  height={'32'}
+                  alt={clazz}
+                />
+              ))}
           </div>
         );
       },
