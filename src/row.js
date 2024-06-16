@@ -1,11 +1,15 @@
 import {
   ALL_CLASSES,
+  SEASON_EIGHT_END,
+  SEASON_EIGHT_START,
   SEASON_FIVE_END,
   SEASON_FIVE_START,
   SEASON_FOUR_END,
   SEASON_FOUR_START,
+  SEASON_NINE_START,
   SEASON_ONE_END,
   SEASON_ONE_START,
+  SEASON_SEVEN_END,
   SEASON_SEVEN_START,
   SEASON_SIX_END,
   SEASON_SIX_START,
@@ -16,6 +20,12 @@ import {
 } from './constants';
 import { enemy } from './util';
 
+export class ClassAndSpec {
+  constructor(playerClass, spec) {
+    this.playerClass = playerClass;
+    this.spec = spec;
+  }
+}
 // noinspection JSUnusedGlobalSymbols
 export class Row {
   constructor(row) {
@@ -67,32 +77,44 @@ export class Row {
     this.enemyPlayerRace4 = row[45];
     this.enemyPlayerRace5 = row[46];
     this.enemyFaction = row[47];
+    this.teamSpec1 = row[48];
+    this.teamSpec2 = row[49];
+    this.teamSpec3 = row[50];
+    this.teamSpec4 = row[51];
+    this.teamSpec5 = row[52];
+    this.enemySpec1 = row[53];
+    this.enemySpec2 = row[54];
+    this.enemySpec3 = row[55];
+    this.enemySpec4 = row[56];
+    this.enemySpec5 = row[57];
   }
 
   // Returns an string containing uppercase classes joined by a '+', or an empty string if the composition is invalid!
-  getComposition = brackets => {
+  getComposition = (brackets, showSpecs) => {
     // We could have added all 5 classes and then filter out falsy values, but it would not be resilient to "ghost player" bugs. isValidNComp addresses that problem. Ghost player entries are therefore ignored.
     const enemyPlayerClasses = [];
     if (this.isValid5sComp() && brackets.includes('5s')) {
       enemyPlayerClasses.push(
-        this.enemyPlayerClass1,
-        this.enemyPlayerClass2,
-        this.enemyPlayerClass3,
-        this.enemyPlayerClass4,
-        this.enemyPlayerClass5
+        this.enemyPlayerClass1 + (showSpecs ? '%' + this.enemySpec1 : ''),
+        this.enemyPlayerClass2 + (showSpecs ? '%' + this.enemySpec2 : ''),
+        this.enemyPlayerClass3 + (showSpecs ? '%' + this.enemySpec3 : ''),
+        this.enemyPlayerClass4 + (showSpecs ? '%' + this.enemySpec4 : ''),
+        this.enemyPlayerClass5 + (showSpecs ? '%' + this.enemySpec5 : '')
       );
     } else if (this.isValid3sComp() && brackets.includes('3s')) {
       enemyPlayerClasses.push(
-        this.enemyPlayerClass1,
-        this.enemyPlayerClass2,
-        this.enemyPlayerClass3
+        this.enemyPlayerClass1 + (showSpecs ? '%' + this.enemySpec1 : ''),
+        this.enemyPlayerClass2 + (showSpecs ? '%' + this.enemySpec2 : ''),
+        this.enemyPlayerClass3 + (showSpecs ? '%' + this.enemySpec3 : '')
       );
     } else if (this.isValid2sComp() && brackets.includes('2s')) {
-      enemyPlayerClasses.push(this.enemyPlayerClass1, this.enemyPlayerClass2);
+      enemyPlayerClasses.push(
+        this.enemyPlayerClass1 + (showSpecs ? '%' + this.enemySpec1 : ''),
+        this.enemyPlayerClass2 + (showSpecs ? '%' + this.enemySpec2 : '')
+      );
     }
-    return enemyPlayerClasses
-      .sort((a, b) => ALL_CLASSES.indexOf(a) - ALL_CLASSES.indexOf(b))
-      .join('+');
+
+    return enemyPlayerClasses.sort((a, b) => a < b).join('+');
   };
 
   won = () =>
@@ -191,15 +213,29 @@ export class Row {
   }
 
   isSeasonFive() {
-    return this.startTime > SEASON_FIVE_START && this.startTime < SEASON_FIVE_END;
+    return (
+      this.startTime > SEASON_FIVE_START && this.startTime < SEASON_FIVE_END
+    );
   }
 
   isSeasonSix() {
     return this.startTime > SEASON_SIX_START && this.startTime < SEASON_SIX_END;
   }
 
-  isSeasonSevenOrLater() {
-    return this.startTime > SEASON_SEVEN_START
+  isSeasonSeven() {
+    return (
+      this.startTime > SEASON_SEVEN_START && this.startTime < SEASON_SEVEN_END
+    );
+  }
+
+  isSeasonEight() {
+    return (
+      this.startTime > SEASON_EIGHT_START && this.startTime < SEASON_EIGHT_END
+    );
+  }
+
+  isSeasonNineOrLater() {
+    return this.startTime > SEASON_NINE_START;
   }
 
   isValidSeason() {
@@ -210,7 +246,9 @@ export class Row {
       this.isSeasonFour() ||
       this.isSeasonFive() ||
       this.isSeasonSix() ||
-      this.isSeasonSevenOrLater()
+      this.isSeasonSeven() ||
+      this.isSeasonEight() ||
+      this.isSeasonNineOrLater()
     );
   }
 
@@ -221,7 +259,7 @@ export class Row {
     return `${outcome} as ${this.allies()} vs ${enemies}${mmr}`;
     // could also have shown isRanked/diffRating, day (endTime), zoneId...
   };
-  
+
   allyClasses = () => {
     const allies = [
       this.teamPlayerClass1,
@@ -229,21 +267,36 @@ export class Row {
       this.teamPlayerClass3,
       this.teamPlayerClass4,
       this.teamPlayerClass5,
-      ];
+    ];
 
     return allies.filter(a => !!a);
   };
 
-  allies = () => {
+  teamComp = () => {
     const allies = [
-      this.teamPlayerName1,
-      this.teamPlayerName2,
-      this.teamPlayerName3,
-      this.teamPlayerName4,
-      this.teamPlayerName5,
+      new ClassAndSpec(this.teamPlayerClass1, this.teamSpec1),
+      new ClassAndSpec(this.teamPlayerClass2, this.teamSpec2),
+      new ClassAndSpec(this.teamPlayerClass3, this.teamSpec3),
+      new ClassAndSpec(this.teamPlayerClass4, this.teamSpec4),
+      new ClassAndSpec(this.teamPlayerClass5, this.teamSpec5),
     ];
 
-    return allies.filter(a => !!a).join('/');
+    return allies.filter(a => !!a.playerClass);
+  };
+
+  allies = () => {
+    const allies = [
+      new ClassAndSpec(this.teamPlayerName1, this.teamSpec1),
+      new ClassAndSpec(this.teamPlayerName2, this.teamSpec2),
+      new ClassAndSpec(this.teamPlayerName3, this.teamSpec3),
+      new ClassAndSpec(this.teamPlayerName4, this.teamSpec4),
+      new ClassAndSpec(this.teamPlayerName5, this.teamSpec5),
+    ];
+
+    return allies
+      .filter(a => !!a.playerClass)
+      .map(a => a.playerClass)
+      .join('/');
   };
 
   enemies = () => {

@@ -13,6 +13,7 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
+  Accordion,
 } from 'react-bootstrap';
 import { computeBadges } from './badgeLogic';
 import {
@@ -25,6 +26,9 @@ import { Row } from './row';
 import BootstrapTable from 'react-bootstrap-table-next';
 import * as icons from './icons';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+import AccordionItem from 'react-bootstrap/esm/AccordionItem';
+import AccordionHeader from 'react-bootstrap/esm/AccordionHeader';
+import AccordionBody from 'react-bootstrap/esm/AccordionBody';
 
 export default function App() {
   // React state
@@ -35,12 +39,14 @@ export default function App() {
   const [seasons, setSeasons] = useState(DEFAULT_SEASONS);
   const [brackets, setBrackets] = useState(DEFAULT_BRACKETS);
   const [playerClasses, setPlayerClasses] = useState(ALL_CLASSES);
+  const [showSpecs, setShowSpecs] = useState(true);
 
   // Inferred state
   let totalMatches = 0;
   let totalWins = 0;
   let statsForEachComposition = [];
   let badges = [];
+  let winrates = [];
 
   if (!timestampsOk())
     console.log('Error in arena season start/end timestamps!');
@@ -75,14 +81,20 @@ export default function App() {
       const seasonSpecificData = getSeasonSpecificData(cleanData);
       const bracketAndSeasonSpecificData =
         getBracketSpecificData(seasonSpecificData);
-      const playerClassSpecificData =
-        getPlayerClassSpecificData(bracketAndSeasonSpecificData);
+      const playerClassSpecificData = getPlayerClassSpecificData(
+        bracketAndSeasonSpecificData
+      );
       const possibleCompositions = getAllPossibleCompositions(
         playerClassSpecificData
       );
       statsForEachComposition = getStatsForEachComposition(
         playerClassSpecificData,
         possibleCompositions
+      );
+
+      winrates = getStatsAgainstClassesAndSpecs(
+        playerClassSpecificData,
+        showSpecs
       );
 
       totalMatches = statsForEachComposition.reduce(
@@ -107,7 +119,9 @@ export default function App() {
         (row.isSeasonFour() && seasons.includes('s4')) ||
         (row.isSeasonFive() && seasons.includes('s5')) ||
         (row.isSeasonSix() && seasons.includes('s6')) ||
-        (row.isSeasonSevenOrLater() && seasons.includes('s7'))
+        (row.isSeasonSeven() && seasons.includes('s7')) ||
+        (row.isSeasonEight() && seasons.includes('s8')) ||
+        (row.isSeasonNineOrLater() && seasons.includes('s9'))
     );
   };
 
@@ -117,23 +131,65 @@ export default function App() {
         (row.is2sData() && brackets.includes('2s')) ||
         (row.is3sData() && brackets.includes('3s')) ||
         (row.is5sData() && brackets.includes('5s'))
-        );
+    );
   };
-  
+
   const getPlayerClassSpecificData = data => {
-    return data.filter(
-      row => row.allyClasses().every(v => playerClasses.includes(v)));
+    return data.filter(row =>
+      row.allyClasses().every(v => playerClasses.includes(v))
+    );
   };
 
   const getAllPossibleCompositions = data => {
     const compositions = new Set();
     data.forEach(row => {
-      const comp = row.getComposition(brackets);
+      const comp = row.getComposition(brackets, showSpecs);
       if (comp !== '') {
         compositions.add(comp);
       }
     });
     return Array.from(compositions).sort((a, b) => a.localeCompare(b)); // this .sort is useless; it will be re-sorted by wins anyway
+  };
+
+  const getStatsAgainstClassesAndSpecs = (data, showSpecs) => {
+    const stats = [];
+
+    for (const row of data) {
+      const comp = row.getComposition(brackets, showSpecs);
+
+      for (const player of comp.split('+')) {
+        let clazz = '';
+        let spec = '';
+
+        if (showSpecs) {
+          [clazz, spec] = player.split('%');
+        } else {
+          clazz = player;
+        }
+
+        if (clazz === '') {
+          continue;
+        }
+
+        let index = stats.findIndex(s => s.clazz === clazz && s.spec === spec);
+
+        if (index !== -1) {
+          stats[index].total = stats[index].total + 1;
+          if (row.won()) {
+            stats[index].wins = stats[index].wins + 1;
+          }
+        } else {
+          stats.push({
+            clazz: clazz,
+            spec: spec,
+            total: 1,
+            wins: row.won() ? 1 : 0,
+          });
+        }
+      }
+    }
+
+    return stats.sort((a, b) => b.wins / b.total > a.wins / a.total);
   };
 
   const getStatsForEachComposition = (data, possibleCompositions) => {
@@ -150,7 +206,7 @@ export default function App() {
     });
 
     data.forEach(row => {
-      const comp = row.getComposition(brackets);
+      const comp = row.getComposition(brackets, showSpecs);
       if (comp !== '') {
         const index = stats.findIndex(s => s.comp === comp);
         if (index !== -1) {
@@ -179,6 +235,22 @@ export default function App() {
 
   processState();
 
+  const sortValue = cell => {
+    if (!cell.includes('%')) {
+      return 1;
+    }
+
+    if (cell.includes('Restoration')) {
+      return -100;
+    } else if (cell.includes('Holy')) {
+      return -90;
+    } else if (cell.includes('Discipline')) {
+      return -80;
+    }
+
+    return cell.split('%')[0].length;
+  };
+
   const columns = [
     {
       dataField: 'composition',
@@ -188,15 +260,17 @@ export default function App() {
         const classes = cell.split('+');
         return (
           <div key={cell}>
-            {classes.map((clazz, idx) => (
-              <img
-                key={idx + clazz}
-                src={classIcon(clazz)}
-                width={'32'}
-                height={'32'}
-                alt={clazz}
-              />
-            ))}
+            {classes
+              .sort((a, b) => sortValue(a) < sortValue(b))
+              .map((clazz, idx) => (
+                <img
+                  key={idx + clazz}
+                  src={classIcon(clazz)}
+                  width={'32'}
+                  height={'32'}
+                  alt={clazz}
+                />
+              ))}
           </div>
         );
       },
@@ -393,27 +467,149 @@ export default function App() {
   });
 
   const classIcon = clazz => {
-    switch (clazz) {
+    const [classPart, specPart] = clazz.split('%');
+
+    switch (classPart) {
       case 'WARRIOR':
-        return icons.warrior;
+        if (clazz.includes('%')) {
+          if (specPart === 'Fury') {
+            return icons.fury;
+          } else if (specPart === 'Arms') {
+            return icons.arms;
+          } else if (specPart === 'Protection') {
+            return icons.protection;
+          } else {
+            return icons.warrior;
+          }
+        } else {
+          return icons.warrior;
+        }
       case 'DEATHKNIGHT':
-        return icons.deathknight;
+        if (clazz.includes('%')) {
+          if (specPart === 'Frost') {
+            return icons.frost;
+          } else if (specPart === 'Unholy') {
+            return icons.unholy;
+          } else if (specPart === 'Blood') {
+            return icons.blood;
+          } else {
+            return icons.deathknight;
+          }
+        } else {
+          return icons.deathknight;
+        }
       case 'PALADIN':
-        return icons.paladin;
+        if (clazz.includes('%')) {
+          if (specPart === 'Holy') {
+            return icons.holy;
+          } else if (specPart === 'Protection') {
+            return icons.protection;
+          } else if (specPart === 'Retribution') {
+            return icons.retribution;
+          } else {
+            return icons.paladin;
+          }
+        } else {
+          return icons.paladin;
+        }
       case 'HUNTER':
-        return icons.hunter;
+        if (clazz.includes('%')) {
+          if (specPart === 'Beastmastery') {
+            return icons.beastmastery;
+          } else if (specPart === 'Marksmanship') {
+            return icons.marksmanship;
+          } else if (specPart === 'Survival') {
+            return icons.survival;
+          } else {
+            return icons.hunter;
+          }
+        } else {
+          return icons.hunter;
+        }
       case 'SHAMAN':
-        return icons.shaman;
+        if (clazz.includes('%')) {
+          if (specPart === 'Elemental') {
+            return icons.elemental;
+          } else if (specPart === 'Enhancement') {
+            return icons.enhancement;
+          } else if (specPart === 'Restoration') {
+            return icons.restoration;
+          } else {
+            return icons.shaman;
+          }
+        } else {
+          return icons.shaman;
+        }
       case 'ROGUE':
-        return icons.rogue;
+        if (clazz.includes('%')) {
+          if (specPart === 'Assassination') {
+            return icons.assassination;
+          } else if (specPart === 'Combat') {
+            return icons.combat;
+          } else if (specPart === 'Subtlety') {
+            return icons.subtlety;
+          } else {
+            return icons.rogue;
+          }
+        } else {
+          return icons.rogue;
+        }
       case 'DRUID':
-        return icons.druid;
+        if (clazz.includes('%')) {
+          if (specPart === 'Balance') {
+            return icons.balance;
+          } else if (specPart === 'Feral') {
+            return icons.feral;
+          } else if (specPart === 'Restoration') {
+            return icons.restorationDruid;
+          } else {
+            return icons.druid;
+          }
+        } else {
+          return icons.druid;
+        }
       case 'PRIEST':
-        return icons.priest;
+        if (clazz.includes('%')) {
+          if (specPart === 'Discipline') {
+            return icons.discipline;
+          } else if (specPart === 'Holy') {
+            return icons.holy;
+          } else if (specPart === 'Shadow') {
+            return icons.shadow;
+          } else {
+            return icons.priest;
+          }
+        } else {
+          return icons.priest;
+        }
       case 'MAGE':
-        return icons.mage;
+        if (clazz.includes('%')) {
+          if (specPart === 'Arcane') {
+            return icons.arcane;
+          } else if (specPart === 'Fire') {
+            return icons.fire;
+          } else if (specPart === 'Frost') {
+            return icons.frostMage;
+          } else {
+            return icons.mage;
+          }
+        } else {
+          return icons.mage;
+        }
       case 'WARLOCK':
-        return icons.warlock;
+        if (clazz.includes('%')) {
+          if (specPart === 'Affliction') {
+            return icons.affliction;
+          } else if (specPart === 'Demonology') {
+            return icons.demonology;
+          } else if (specPart === 'Destruction') {
+            return icons.destruction;
+          } else {
+            return icons.warlock;
+          }
+        } else {
+          return icons.warlock;
+        }
       default:
         return icons.unknown;
     }
@@ -491,187 +687,268 @@ export default function App() {
             </Alert>
           </Container>
         ) : (
-          <Container>
-            <br />
-            <strong>Total matches: {totalMatches}</strong>
-            <br />
-            <strong className="total-wins">Total wins: {totalWins}</strong>
-            <br />
-            {!!totalMatches && (
-              <strong>
-                Total win rate: {((totalWins / totalMatches) * 100).toFixed(2)}%
-              </strong>
-            )}
-            <br />
-            <br />
-            <ToggleButtonGroup
-              type="checkbox"
-              defaultValue={DEFAULT_SEASONS}
-              onChange={setSeasons}
-              className="as-toggle-button-groups"
-            >
-              <ToggleButton
-                id="season-1"
-                value={'s1'}
-                variant={'outline-primary'}
-              >
-                Season 1
-              </ToggleButton>
-              <ToggleButton
-                id="season-2"
-                value={'s2'}
-                variant={'outline-primary'}
-              >
-                Season 2
-              </ToggleButton>
-              <ToggleButton
-                id="season-3"
-                value={'s3'}
-                variant={'outline-primary'}
-              >
-                Season 3
-              </ToggleButton>
-              <ToggleButton
-                id="season-4"
-                value={'s4'}
-                variant={'outline-primary'}
-              >
-                Season 4
-              </ToggleButton>
-              <ToggleButton
-                id="season-5"
-                value={'s5'}
-                variant={'outline-primary'}
-              >
-                Season 5
-              </ToggleButton>
-              <ToggleButton
-                id="season-6"
-                value={'s6'}
-                variant={'outline-primary'}
-              >
-                Season 6
-              </ToggleButton>
-              <ToggleButton
-                id="season-7"
-                value={'s7'}
-                variant={'outline-primary'}
-              >
-                Season 7+
-              </ToggleButton>
-            </ToggleButtonGroup>
-            <br />
-            <ToggleButtonGroup
-              type="checkbox"
-              defaultValue={DEFAULT_BRACKETS}
-              onChange={setBrackets}
-              className="as-toggle-button-groups"
-            >
-              <ToggleButton
-                id="bracket-2s"
-                value={'2s'}
-                variant={'outline-primary'}
-              >
-                2v2
-              </ToggleButton>
-              <ToggleButton
-                id="bracket-3s"
-                value={'3s'}
-                variant={'outline-primary'}
-              >
-                3v3
-              </ToggleButton>
-              <ToggleButton
-                id="bracket-5s"
-                value={'5s'}
-                variant={'outline-primary'}
-              >
-                5v5
-              </ToggleButton>
-            </ToggleButtonGroup>
-            <br />
-            <strong>Team composition: </strong>
-            <ToggleButtonGroup
-              type="checkbox"
-              defaultValue={ALL_CLASSES}
-              onChange={setPlayerClasses}
-              className="as-toggle-button-groups"
-              >
-              {
-                ALL_CLASSES.map(cl => (
-                  <ToggleButton
-                    id={cl + '-toggle-button'}
-                    value={cl}
-                    variant={'outline-primary'}
-                    >
-                    <img
-                      src={classIcon(cl)}
-                      width={'32'}
-                      height={'32'}
-                      alt={cl}
+          <Container fluid>
+            <div className="main-content">
+              <div className="settings">
+                <div>
+                  <Form>
+                    <Form.Check
+                      type="checkbox"
+                      id={'checkbox_specs'}
+                      label={`Show Specs`}
+                      checked={showSpecs}
+                      onChange={() => setShowSpecs(!showSpecs)}
                     />
-                  </ToggleButton>
-                ))
-              }
-            </ToggleButtonGroup>
-            <br />{' '}
-            <p>
-              <span className="blue">Blue = vs Alliance</span>{' '}
-              <span className="red">Red = vs Horde</span>
-            </p>
-            <BootstrapTable
-              keyField="composition"
-              data={content}
-              columns={columns}
-              defaultSorted={[{ dataField: 'total', order: 'desc' }]}
-              bootstrap4={true}
-              striped={true}
-              bordered={true}
-              hover={true}
-              classes={'data-table'}
-            />
-            <Container>
-              <BootstrapRow
-                xs={1}
-                sm={2}
-                md={2}
-                lg={3}
-                xl={4}
-                xxl={4}
-                className="g-4"
-              >
-                {badges.map(badge => (
-                  <Col key={badge.title}>
-                    <Card
-                      key={badge.title}
-                      border={badge.appearance}
-                      style={{ height: '100%' }}
+                  </Form>
+                </div>
+                <div>
+                  <h2>Brackets</h2>
+                  <ToggleButtonGroup
+                    type="checkbox"
+                    defaultValue={DEFAULT_BRACKETS}
+                    onChange={setBrackets}
+                  >
+                    <ToggleButton
+                      id="bracket-2s"
+                      value={'2s'}
+                      variant={'outline-primary'}
                     >
-                      <Card.Header as="h5">{badge.title}</Card.Header>
-                      <Card.Body>
-                        <Card.Text className="mb-2 text-muted">
-                          {badge.details ? (
-                            badge.details
-                          ) : (
-                            <ul className="sober">
-                              {badge.detailsArray.map(it => (
-                                <li>{it}</li>
-                              ))}
-                            </ul>
-                          )}
-                        </Card.Text>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                ))}
-              </BootstrapRow>
-            </Container>
-            <br />
-            <p>
-              Skipped <strong className="red">{corruptedCount}</strong>{' '}
-              unprocessable records (all seasons/brackets considered). Open
-              console to inspect them if needed.
-            </p>
+                      2v2
+                    </ToggleButton>
+                    <ToggleButton
+                      id="bracket-3s"
+                      value={'3s'}
+                      variant={'outline-primary'}
+                    >
+                      3v3
+                    </ToggleButton>
+                    <ToggleButton
+                      id="bracket-5s"
+                      value={'5s'}
+                      variant={'outline-primary'}
+                    >
+                      5v5
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </div>
+                <div className="seasons">
+                  <Accordion defaultActiveKey={0}>
+                    <AccordionItem eventKey="0">
+                      <AccordionHeader>Seasons</AccordionHeader>
+                      <AccordionBody>
+                        <ToggleButtonGroup
+                          type="checkbox"
+                          defaultValue={DEFAULT_SEASONS}
+                          vertical={true}
+                          size="lg"
+                          onChange={setSeasons}
+                        >
+                          <ToggleButton
+                            id="season-1"
+                            value={'s1'}
+                            variant={'outline-primary'}
+                          >
+                            Season 1
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-2"
+                            value={'s2'}
+                            variant={'outline-primary'}
+                          >
+                            Season 2
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-3"
+                            value={'s3'}
+                            variant={'outline-primary'}
+                          >
+                            Season 3
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-4"
+                            value={'s4'}
+                            variant={'outline-primary'}
+                          >
+                            Season 4
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-5"
+                            value={'s5'}
+                            variant={'outline-primary'}
+                          >
+                            Season 5
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-6"
+                            value={'s6'}
+                            variant={'outline-primary'}
+                          >
+                            Season 6
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-7"
+                            value={'s7'}
+                            variant={'outline-primary'}
+                          >
+                            Season 7
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-8"
+                            value={'s8'}
+                            variant={'outline-primary'}
+                          >
+                            Season 8
+                          </ToggleButton>
+                          <ToggleButton
+                            id="season-9"
+                            value={'s9'}
+                            variant={'outline-primary'}
+                          >
+                            Season 9+
+                          </ToggleButton>
+                        </ToggleButtonGroup>
+                      </AccordionBody>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              </div>
+              <div>
+                <div className="header-stats">
+                  <strong>Total matches: {totalMatches}</strong>
+                  <strong>Total wins: {totalWins}</strong>
+                  {!!totalMatches && (
+                    <strong>
+                      Total win rate:{' '}
+                      {((totalWins / totalMatches) * 100).toFixed(2)}%
+                    </strong>
+                  )}
+                  <strong>Team composition: </strong>
+                  <ToggleButtonGroup
+                    type="checkbox"
+                    defaultValue={ALL_CLASSES}
+                    onChange={setPlayerClasses}
+                    className="as-toggle-button-groups"
+                  >
+                    {ALL_CLASSES.map(cl => (
+                      <ToggleButton
+                        id={cl + '-toggle-button'}
+                        value={cl}
+                        variant={'outline-primary'}
+                      >
+                        <img
+                          src={classIcon(cl)}
+                          width={'32'}
+                          height={'32'}
+                          alt={cl}
+                        />
+                      </ToggleButton>
+                    ))}
+                  </ToggleButtonGroup>
+                  <p>
+                    <span className="blue">Blue = vs Alliance</span>{' '}
+                    <span className="red">Red = vs Horde</span>
+                  </p>
+                </div>
+                <BootstrapTable
+                  keyField="composition"
+                  data={content}
+                  columns={columns}
+                  defaultSorted={[{ dataField: 'total', order: 'desc' }]}
+                  bootstrap4={true}
+                  striped={true}
+                  bordered={true}
+                  hover={true}
+                  classes={'data-table'}
+                />
+                <Container>
+                  <BootstrapRow
+                    xs={1}
+                    sm={2}
+                    md={2}
+                    lg={3}
+                    xl={4}
+                    xxl={4}
+                    className="g-4"
+                  >
+                    {badges.map(badge => (
+                      <Col key={badge.title}>
+                        <Card
+                          key={badge.title}
+                          border={badge.appearance}
+                          style={{ height: '100%' }}
+                        >
+                          <Card.Header as="h5">{badge.title}</Card.Header>
+                          <Card.Body>
+                            <Card.Text className="mb-2 text-muted">
+                              {badge.details ? (
+                                badge.details
+                              ) : (
+                                <ul className="sober">
+                                  {badge.detailsArray.map(it => (
+                                    <li>{it}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </Card.Text>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    ))}
+                  </BootstrapRow>
+                </Container>
+                <br />
+                <p>
+                  Skipped <strong className="red">{corruptedCount}</strong>{' '}
+                  unprocessable records (all seasons/brackets considered). Open
+                  console to inspect them if needed.
+                </p>
+              </div>
+              <div className="random-stats">
+                <div>
+                  <h2>Win %</h2>
+                  <div className="winrates-class">
+                    {winrates.map(x => {
+                      return (
+                        <div className="winrate-item">
+                          <img
+                            key={x.clazz + '%' + x.spec}
+                            src={classIcon(x.clazz + '%' + x.spec)}
+                            width={'32'}
+                            height={'32'}
+                            alt={x.clazz}
+                          />
+                          <span className="winrate-text">
+                            {parseFloat((x.wins / x.total) * 100).toFixed(1) +
+                              '%'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <h2>Games vs.</h2>
+                  <div className="winrates-class">
+                    {winrates
+                      .sort((a, b) => a.total < b.total)
+                      .map(x => {
+                        return (
+                          <div className="winrate-item">
+                            <img
+                              key={x.clazz + '%' + x.spec}
+                              src={classIcon(x.clazz + '%' + x.spec)}
+                              width={'32'}
+                              height={'32'}
+                              alt={x.clazz}
+                            />
+                            <span className="winrate-text">{x.total}</span>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              </div>
+            </div>
           </Container>
         )}
 
@@ -723,10 +1000,6 @@ export default function App() {
           border: none;
           margin-top: 10px;
         }
-
-        .total-wins {
-          margin-bottom: 10px;
-        }
         .data-table {
           margin-top: 10px;
           text-align: center;
@@ -749,6 +1022,7 @@ export default function App() {
         .as-toggle-button-groups > label {
           margin: 0 10px 0 0;
           border-radius: 0.25rem !important;
+          overflow: hidden;
         }
         .as-toggle-button-groups > label:hover {
           background-color: lightsteelblue;
