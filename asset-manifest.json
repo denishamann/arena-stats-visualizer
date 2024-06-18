@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/arena-stats-visualizer/static/css/main.e9f9e719.css",
-    "main.js": "/arena-stats-visualizer/static/js/main.01c37bb3.js",
-    "static/js/787.bd082fa1.chunk.js": "/arena-stats-visualizer/static/js/787.bd082fa1.chunk.js",
+    "main.css": "/arena-stats-visualizer/static/css/main.1bf66d05.css",
+    "main.js": "/arena-stats-visualizer/static/js/main.aed6a127.js",
+    "static/js/453.044d98f3.chunk.js": "/arena-stats-visualizer/static/js/453.044d98f3.chunk.js",
     "static/media/alliance.png": "/arena-stats-visualizer/static/media/alliance.948620f625706393c5e3.png",
     "static/media/horde.png": "/arena-stats-visualizer/static/media/horde.bd8cecab9219c5312103.png",
     "static/media/hunter.webp": "/arena-stats-visualizer/static/media/hunter.e4e7acdc1eda32ec4999.webp",
@@ -17,13 +17,39 @@
     "static/media/rogue.webp": "/arena-stats-visualizer/static/media/rogue.fd889ca8daae7a01b755.webp",
     "static/media/priest.webp": "/arena-stats-visualizer/static/media/priest.a0da6b10c1a09c6c780b.webp",
     "static/media/warrior.webp": "/arena-stats-visualizer/static/media/warrior.ecec3981eff8f0fc47cf.webp",
+    "static/media/shadow.webp": "/arena-stats-visualizer/static/media/shadow.f7f7e4bf89e14adf1758.webp",
+    "static/media/retribution.webp": "/arena-stats-visualizer/static/media/retribution.0f3cdd9d32205e736889.webp",
+    "static/media/discipline.webp": "/arena-stats-visualizer/static/media/discipline.94115a88da964085d4dc.webp",
+    "static/media/beastmastery.webp": "/arena-stats-visualizer/static/media/beastmastery.0edf0ee95d2b75abcb7e.webp",
+    "static/media/frost.webp": "/arena-stats-visualizer/static/media/frost.60fce638b1bfb2f93d84.webp",
+    "static/media/restoration.webp": "/arena-stats-visualizer/static/media/restoration.352def908727eaccb745.webp",
+    "static/media/holy.webp": "/arena-stats-visualizer/static/media/holy.7c64eadc2402428a1d69.webp",
+    "static/media/protection.webp": "/arena-stats-visualizer/static/media/protection.be8374a94cbec3726173.webp",
+    "static/media/unholy.webp": "/arena-stats-visualizer/static/media/unholy.a2cb6df7ae29317c4994.webp",
+    "static/media/arcane.webp": "/arena-stats-visualizer/static/media/arcane.7508a4b2a507d6585ee9.webp",
+    "static/media/affliction.webp": "/arena-stats-visualizer/static/media/affliction.b9a0638fdcd176431c8f.webp",
+    "static/media/marksmanship.webp": "/arena-stats-visualizer/static/media/marksmanship.022254cc32469032fe1f.webp",
+    "static/media/assassination.webp": "/arena-stats-visualizer/static/media/assassination.3061e4d73707867bc5d8.webp",
+    "static/media/fury.webp": "/arena-stats-visualizer/static/media/fury.9dcf7e46dc574195fc8c.webp",
+    "static/media/feral.webp": "/arena-stats-visualizer/static/media/feral.ed7f3b095bb8040ba34a.webp",
+    "static/media/combat.webp": "/arena-stats-visualizer/static/media/combat.dbf5a44971c0d3df946c.webp",
+    "static/media/blood.webp": "/arena-stats-visualizer/static/media/blood.5b8d5f308f1cf519887f.webp",
+    "static/media/survival.webp": "/arena-stats-visualizer/static/media/survival.b3ccc49be89de98e2b46.webp",
+    "static/media/demonology.webp": "/arena-stats-visualizer/static/media/demonology.189799e12bcf2e67383e.webp",
+    "static/media/enhancement.webp": "/arena-stats-visualizer/static/media/enhancement.7249a42ba4fbc4b753bd.webp",
+    "static/media/fire.webp": "/arena-stats-visualizer/static/media/fire.51e9442dbadaad4af9da.webp",
+    "static/media/arms.webp": "/arena-stats-visualizer/static/media/arms.3aa9cdc392bd06028ef8.webp",
+    "static/media/subtlety.webp": "/arena-stats-visualizer/static/media/subtlety.e7c0dd2de81149f7abaf.webp",
+    "static/media/destruction.webp": "/arena-stats-visualizer/static/media/destruction.7404f468410930eae70c.webp",
+    "static/media/balance.webp": "/arena-stats-visualizer/static/media/balance.abb545b028df938cd917.webp",
+    "static/media/elemental.webp": "/arena-stats-visualizer/static/media/elemental.815dd070933be85cbae9.webp",
     "index.html": "/arena-stats-visualizer/index.html",
-    "main.e9f9e719.css.map": "/arena-stats-visualizer/static/css/main.e9f9e719.css.map",
-    "main.01c37bb3.js.map": "/arena-stats-visualizer/static/js/main.01c37bb3.js.map",
-    "787.bd082fa1.chunk.js.map": "/arena-stats-visualizer/static/js/787.bd082fa1.chunk.js.map"
+    "main.1bf66d05.css.map": "/arena-stats-visualizer/static/css/main.1bf66d05.css.map",
+    "main.aed6a127.js.map": "/arena-stats-visualizer/static/js/main.aed6a127.js.map",
+    "453.044d98f3.chunk.js.map": "/arena-stats-visualizer/static/js/453.044d98f3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e9f9e719.css",
-    "static/js/main.01c37bb3.js"
+    "static/css/main.1bf66d05.css",
+    "static/js/main.aed6a127.js"
   ]
 }
